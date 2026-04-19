@@ -6,10 +6,14 @@ from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 from typing import List
 from datetime import datetime, timedelta
+from pathlib import Path
 import random
 
 # Fixed seed for consistent mock data (demonstration stability)
 random.seed(42)
+
+# Base directory for resolving templates and static files
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 app = FastAPI(
     title="Sepsis AI Monitoring System",
@@ -27,7 +31,7 @@ app.add_middleware(
 )
 
 # Mount static files
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/static", StaticFiles(directory=str(BASE_DIR / "static")), name="static")
 
 
 # ============ Data Models ============
@@ -328,14 +332,14 @@ MOCK_PATIENTS = {
 @app.get("/", response_class=HTMLResponse)
 async def root():
     """Home page - Landing Page"""
-    with open("templates/landing.html", "r", encoding="utf-8") as f:
+    with open(BASE_DIR / "templates" / "landing.html", "r", encoding="utf-8") as f:
         return HTMLResponse(content=f.read())
 
 
 @app.get("/dashboard", response_class=HTMLResponse)
 async def dashboard():
     """Dashboard page"""
-    with open("templates/index.html", "r", encoding="utf-8") as f:
+    with open(BASE_DIR / "templates" / "index.html", "r", encoding="utf-8") as f:
         return HTMLResponse(content=f.read())
 
 
