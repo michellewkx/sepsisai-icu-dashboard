@@ -327,7 +327,14 @@ MOCK_PATIENTS = {
 
 @app.get("/", response_class=HTMLResponse)
 async def root():
-    """Home page - Dashboard"""
+    """Home page - Landing Page"""
+    with open("templates/landing.html", "r", encoding="utf-8") as f:
+        return HTMLResponse(content=f.read())
+
+
+@app.get("/dashboard", response_class=HTMLResponse)
+async def dashboard():
+    """Dashboard page"""
     with open("templates/index.html", "r", encoding="utf-8") as f:
         return HTMLResponse(content=f.read())
 

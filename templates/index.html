@@ -19,6 +19,11 @@
         <!-- Header -->
         <header class="header">
             <div class="header-brand">
+                <a href="/" class="back-link" title="Back to Home">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                </a>
                 <div class="brand-logo">
                     <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
                         <path d="M14 2L2 8V20L14 26L26 20V8L14 2Z" stroke="currentColor" stroke-width="1.5" fill="none"/>
@@ -97,27 +102,50 @@
                     <h2 class="patient-name"></h2>
                     <div class="patient-meta">
                         <span class="meta-item">
-                            <span class="meta-icon">👤</span>
+                            <span class="meta-icon">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                </svg>
+                            </span>
                             <span class="meta-text"><span class="patient-age"></span>, <span class="patient-gender"></span></span>
                         </span>
                         <span class="meta-item">
-                            <span class="meta-icon">🆔</span>
+                            <span class="meta-icon">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="9" y1="3" x2="9" y2="21"></line>
+                                    <line x1="15" y1="3" x2="15" y2="21"></line>
+                                    <line x1="3" y1="9" x2="21" y2="9"></line>
+                                    <line x1="3" y1="15" x2="21" y2="15"></line>
+                                </svg>
+                            </span>
                             <span class="meta-text patient-id"></span>
                         </span>
                         <span class="meta-item">
-                            <span class="meta-icon">🕒</span>
+                            <span class="meta-icon">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12 6 12 12 16 14"></polyline>
+                                </svg>
+                            </span>
                             <span class="meta-text patient-time"></span>
                         </span>
                     </div>
                 </div>
                 <div class="location-badge">
-                    <span class="location-icon">📍</span>
+                    <span class="location-icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                            <circle cx="12" cy="10" r="3"></circle>
+                        </svg>
+                    </span>
                     <span class="location-text patient-location"></span>
                 </div>
             </div>
 
             <!-- Primary Risk Card -->
-            <div class="risk-card primary-risk-card">
+            <div class="risk-card primary-risk-card anim-card" style="--card-index: 0;">
                 <div class="risk-card-header">
                     <div class="risk-title">
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -154,9 +182,15 @@
 
             <!-- Multi-Task Risk Grid -->
             <div class="multi-risk-grid">
-                <div class="risk-card secondary-risk-card">
+                <div class="risk-card secondary-risk-card anim-card" style="--card-index: 1;">
                     <div class="secondary-risk-header">
-                        <span class="risk-icon">🫀</span>
+                        <span class="risk-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M9 12h6"></path>
+                                <path d="M12 9v6"></path>
+                                <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-4l-2-3H10L8 6H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2z"></path>
+                            </svg>
+                        </span>
                         <span class="risk-name">Acute Kidney Injury</span>
                     </div>
                     <div class="secondary-risk-bar">
@@ -165,9 +199,15 @@
                     <div class="secondary-risk-value aki-risk-value"></div>
                 </div>
 
-                <div class="risk-card secondary-risk-card">
+                <div class="risk-card secondary-risk-card anim-card" style="--card-index: 2;">
                     <div class="secondary-risk-header">
-                        <span class="risk-icon">🫁</span>
+                        <span class="risk-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 22c4-4 8-7.5 8-12a8 8 0 1 0-16 0c0 4.5 4 8 8 12z"></path>
+                                <path d="M8 10h8"></path>
+                                <path d="M8 14h8"></path>
+                            </svg>
+                        </span>
                         <span class="risk-name">ARDS</span>
                     </div>
                     <div class="secondary-risk-bar">
@@ -176,9 +216,15 @@
                     <div class="secondary-risk-value ards-risk-value"></div>
                 </div>
 
-                <div class="risk-card secondary-risk-card">
+                <div class="risk-card secondary-risk-card anim-card" style="--card-index: 3;">
                     <div class="secondary-risk-header">
-                        <span class="risk-icon">⚠️</span>
+                        <span class="risk-icon">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                                <line x1="12" y1="9" x2="12" y2="13"></line>
+                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                            </svg>
+                        </span>
                         <span class="risk-name">Mortality Risk</span>
                     </div>
                     <div class="secondary-risk-bar">
@@ -189,7 +235,7 @@
             </div>
 
             <!-- Diagnosis & Comorbidities -->
-            <div class="info-card">
+            <div class="info-card anim-card" style="--card-index: 4;">
                 <div class="info-card-header">
                     <h3>Clinical Information</h3>
                 </div>
@@ -204,7 +250,7 @@
             </div>
 
             <!-- Vital Signs -->
-            <div class="vitals-card">
+            <div class="vitals-card anim-card" style="--card-index: 5;">
                 <div class="vitals-header">
                     <h3>Vital Signs</h3>
                     <span class="vitals-updated vitals-time"></span>
@@ -212,7 +258,11 @@
                 <div class="vitals-grid">
                     <div class="vital-item">
                         <div class="vital-header">
-                            <span class="vital-icon">❤️</span>
+                            <span class="vital-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                                </svg>
+                            </span>
                             <span class="vital-name">Heart Rate</span>
                         </div>
                         <div class="vital-value heart-rate-value"></div>
@@ -221,7 +271,11 @@
 
                     <div class="vital-item">
                         <div class="vital-header">
-                            <span class="vital-icon">🩸</span>
+                            <span class="vital-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
+                                </svg>
+                            </span>
                             <span class="vital-name">Blood Pressure</span>
                         </div>
                         <div class="vital-value bp-value"></div>
@@ -230,16 +284,27 @@
 
                     <div class="vital-item">
                         <div class="vital-header">
-                            <span class="vital-icon">🌡️</span>
+                            <span class="vital-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"></path>
+                                </svg>
+                            </span>
                             <span class="vital-name">Temperature</span>
                         </div>
                         <div class="vital-value temp-value"></div>
-                        <div class="vital-unit">°C</div>
+                        <div class="vital-unit">&deg;C</div>
                     </div>
 
                     <div class="vital-item">
                         <div class="vital-header">
-                            <span class="vital-icon">💨</span>
+                            <span class="vital-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M17.7 7.7a7.5 7.5 0 1 0-10.6 10.6"></path>
+                                    <path d="M9.4 4.6A7.5 7.5 0 0 1 19.4 14.6"></path>
+                                    <path d="M2 12h4"></path>
+                                    <path d="M18 12h4"></path>
+                                </svg>
+                            </span>
                             <span class="vital-name">Resp. Rate</span>
                         </div>
                         <div class="vital-value rr-value"></div>
@@ -248,8 +313,17 @@
 
                     <div class="vital-item">
                         <div class="vital-header">
-                            <span class="vital-icon">💧</span>
-                            <span class="vital-name">SpO₂</span>
+                            <span class="vital-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <circle cx="12" cy="12" r="4"></circle>
+                                    <line x1="4.93" y1="4.93" x2="9.17" y2="9.17"></line>
+                                    <line x1="14.83" y1="14.83" x2="19.07" y2="19.07"></line>
+                                    <line x1="14.83" y1="9.17" x2="19.07" y2="4.93"></line>
+                                    <line x1="4.93" y1="19.07" x2="9.17" y2="14.83"></line>
+                                </svg>
+                            </span>
+                            <span class="vital-name">SpO&#8322;</span>
                         </div>
                         <div class="vital-value spo2-value"></div>
                         <div class="vital-unit">%</div>
@@ -257,7 +331,15 @@
 
                     <div class="vital-item critical">
                         <div class="vital-header">
-                            <span class="vital-icon">⚗️</span>
+                            <span class="vital-icon">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M10 2v7.31"></path>
+                                    <path d="M14 9.3V2"></path>
+                                    <path d="M8.5 2h7"></path>
+                                    <path d="M14 9.3a6.5 6.5 0 1 1-4 0"></path>
+                                    <path d="M5.58 16.5h12.85"></path>
+                                </svg>
+                            </span>
                             <span class="vital-name">Lactate</span>
                         </div>
                         <div class="vital-value lactate-value"></div>
@@ -266,8 +348,29 @@
                 </div>
             </div>
 
+            <!-- Vitals Trend Sparkline -->
+            <div class="vitals-sparkline-card anim-card" style="--card-index: 6;">
+                <div class="sparkline-header">
+                    <h3>Vitals Trend</h3>
+                    <span class="sparkline-legend">
+                        <span class="legend-item"><span class="legend-dot legend-dot-hr"></span>Heart Rate</span>
+                        <span class="legend-item"><span class="legend-dot legend-dot-risk"></span>Sepsis Risk</span>
+                    </span>
+                </div>
+                <div class="sparkline-container">
+                    <div class="sparkline-chart-wrapper">
+                        <span class="sparkline-label">Heart Rate (bpm)</span>
+                        <canvas id="sparklineHR" width="600" height="100"></canvas>
+                    </div>
+                    <div class="sparkline-chart-wrapper">
+                        <span class="sparkline-label">Sepsis Risk (%)</span>
+                        <canvas id="sparklineRisk" width="600" height="100"></canvas>
+                    </div>
+                </div>
+            </div>
+
             <!-- SHAP Explanation -->
-            <div class="explanation-card">
+            <div class="explanation-card anim-card" style="--card-index: 7;">
                 <div class="explanation-header">
                     <div class="explanation-title">
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -286,10 +389,16 @@
             </div>
 
             <!-- Alerts & Recommendations -->
-            <div class="clinical-card">
+            <div class="clinical-card anim-card" style="--card-index: 8;">
                 <div class="alerts-section">
                     <h4 class="section-title">
-                        <span class="section-icon">🚨</span>
+                        <span class="section-icon">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="8" x2="12" y2="12"></line>
+                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                            </svg>
+                        </span>
                         Clinical Alerts
                     </h4>
                     <div class="alerts-list"></div>
@@ -297,7 +406,13 @@
 
                 <div class="recommendations-section">
                     <h4 class="section-title">
-                        <span class="section-icon">💡</span>
+                        <span class="section-icon">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="9" y1="18" x2="15" y2="18"></line>
+                                <line x1="10" y1="22" x2="14" y2="22"></line>
+                                <path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"></path>
+                            </svg>
+                        </span>
                         Recommendations
                     </h4>
                     <div class="recommendations-list"></div>

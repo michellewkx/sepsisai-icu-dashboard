@@ -5,8 +5,11 @@
 const API_BASE = window.location.origin;
 let currentPatient = null;
 let patientsCache = [];
-let patientsDetailCache = {}; // Cache for patient details
+let patientsDetailCache = {};
 let autoRefreshInterval = null;
+
+// SVG icon for map-pin (used in template literals)
+const SVG_MAP_PIN = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>';
 
 // ============================================
 // Utility Functions
@@ -36,6 +39,10 @@ function updateCurrentTime() {
     }
 }
 
+function isMobile() {
+    return window.innerWidth <= 768;
+}
+
 // ============================================
 // API Calls
 // ============================================
@@ -62,6 +69,126 @@ async function fetchPatientDetail(patientId) {
     }
 }
 
+async function fetchVitalsHistory(patientId) {
+    try {
+        const response = await fetch(`${API_BASE}/api/patients/${patientId}/vitals/history`);
+        if (!response.ok) throw new Error('Failed to fetch vitals history');
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching vitals history:', error);
+        return null;
+    }
+}
+
+// ============================================
+// Sparkline Renderer
+// ============================================
+
+function renderSparkline(canvasId, data, color, options = {}) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas || !data || data.length === 0) return;
+
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+
+    // Set canvas size for HiDPI
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+
+    const width = rect.width;
+    const height = rect.height;
+    const padding = { top: 8, right: 8, bottom: 8, left: 8 };
+    const chartWidth = width - padding.left - padding.right;
+    const chartHeight = height - padding.top - padding.bottom;
+
+    // Compute min/max
+    const values = data.map(d => (typeof d === 'object' ? d.value : d));
+    const minVal = options.min !== undefined ? options.min : Math.min(...values);
+    const maxVal = options.max !== undefined ? options.max : Math.max(...values);
+    const range = maxVal - minVal || 1;
+
+    // Clear canvas
+    ctx.clearRect(0, 0, width, height);
+
+    // Draw subtle horizontal grid lines
+    ctx.strokeStyle = 'rgba(148, 163, 184, 0.15)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 3; i++) {
+        const y = padding.top + (chartHeight / 3) * i;
+        ctx.beginPath();
+        ctx.moveTo(padding.left, y);
+        ctx.lineTo(width - padding.right, y);
+        ctx.stroke();
+    }
+
+    // Map data to points
+    const points = values.map((val, i) => ({
+        x: padding.left + (i / (values.length - 1)) * chartWidth,
+        y: padding.top + chartHeight - ((val - minVal) / range) * chartHeight
+    }));
+
+    // Draw gradient fill
+    const gradient = ctx.createLinearGradient(0, padding.top, 0, height - padding.bottom);
+    gradient.addColorStop(0, color + '30');
+    gradient.addColorStop(1, color + '05');
+
+    ctx.beginPath();
+    ctx.moveTo(points[0].x, height - padding.bottom);
+    points.forEach((p, i) => {
+        if (i === 0) {
+            ctx.lineTo(p.x, p.y);
+        } else {
+            // Smooth curve using quadratic bezier
+            const prev = points[i - 1];
+            const cpX = (prev.x + p.x) / 2;
+            ctx.quadraticCurveTo(prev.x + (cpX - prev.x) * 0.5, prev.y, cpX, (prev.y + p.y) / 2);
+            ctx.quadraticCurveTo(p.x - (p.x - cpX) * 0.5, p.y, p.x, p.y);
+        }
+    });
+    ctx.lineTo(points[points.length - 1].x, height - padding.bottom);
+    ctx.closePath();
+    ctx.fillStyle = gradient;
+    ctx.fill();
+
+    // Draw the line
+    ctx.beginPath();
+    points.forEach((p, i) => {
+        if (i === 0) {
+            ctx.moveTo(p.x, p.y);
+        } else {
+            const prev = points[i - 1];
+            const cpX = (prev.x + p.x) / 2;
+            ctx.quadraticCurveTo(prev.x + (cpX - prev.x) * 0.5, prev.y, cpX, (prev.y + p.y) / 2);
+            ctx.quadraticCurveTo(p.x - (p.x - cpX) * 0.5, p.y, p.x, p.y);
+        }
+    });
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    ctx.stroke();
+
+    // Draw last point dot
+    const last = points[points.length - 1];
+    ctx.beginPath();
+    ctx.arc(last.x, last.y, 4, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(last.x, last.y, 2, 0, Math.PI * 2);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fill();
+
+    // Draw min/max labels
+    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.fillStyle = 'rgba(100, 116, 139, 0.6)';
+    ctx.textAlign = 'left';
+    ctx.fillText(maxVal.toFixed(0), padding.left + 2, padding.top + 10);
+    ctx.fillText(minVal.toFixed(0), padding.left + 2, height - padding.bottom - 2);
+}
+
 // ============================================
 // UI Rendering
 // ============================================
@@ -86,7 +213,7 @@ function renderPatientList(patients) {
                 <span>${patient.gender}</span>
             </div>
             <div class="patient-card-location">
-                <span>📍</span>
+                <span>${SVG_MAP_PIN}</span>
                 <span>${patient.current_location}</span>
             </div>
         </div>
@@ -123,6 +250,15 @@ async function updatePatientRisks() {
     }
 }
 
+function scrollToActivePatient(patientId) {
+    if (!isMobile()) return;
+    const card = document.querySelector(`[data-patient-id="${patientId}"]`);
+    if (!card) return;
+    const container = document.getElementById('patientList');
+    if (!container) return;
+    card.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+}
+
 async function selectPatient(patientId) {
     // Update active state
     document.querySelectorAll('.patient-card').forEach(card => {
@@ -133,17 +269,19 @@ async function selectPatient(patientId) {
         selectedCard.classList.add('active');
     }
 
+    // On mobile, scroll the strip to show active patient
+    scrollToActivePatient(patientId);
+
     // Show loading
     const panel = document.getElementById('mainPanel');
     panel.innerHTML = '<div class="loading-state"><div class="spinner"></div><p>Loading patient data...</p></div>';
 
-    // Use cached detail if available (to sync with sidebar), otherwise fetch new
+    // Use cached detail if available, otherwise fetch new
     let detail;
     if (patientsDetailCache[patientId]) {
         detail = patientsDetailCache[patientId];
-        console.log('Using cached detail for', patientId);
 
-        // Update sidebar badge with cached data to ensure sync
+        // Update sidebar badge with cached data
         if (selectedCard) {
             const badge = selectedCard.querySelector('.patient-risk-badge');
             const risk = getRiskLevel(detail.risk_prediction.sepsis_risk);
@@ -233,7 +371,7 @@ function renderPatientDetail(patient) {
         div.innerHTML = `
             <span class="factor-name">${factor.display_name}</span>
             <span class="factor-change change-${factor.change}">
-                ${factor.change === 'increased' ? '↑' : '↓'} ${Math.abs(factor.delta).toFixed(2)}
+                ${factor.change === 'increased' ? '\u2191' : '\u2193'} ${Math.abs(factor.delta).toFixed(2)}
             </span>
             <span class="factor-impact">${factor.value.toFixed(2)}</span>
         `;
@@ -250,7 +388,7 @@ function renderPatientDetail(patient) {
             alertsList.appendChild(div);
         });
     } else {
-        alertsList.innerHTML = '<div class="alert-item" style="background: var(--success-dim); border-color: var(--success); color: var(--success);">✓ No critical alerts</div>';
+        alertsList.innerHTML = '<div class="alert-item" style="background: var(--success-dim); border-color: var(--success); color: var(--success);">No critical alerts</div>';
     }
 
     // Recommendations
@@ -272,6 +410,63 @@ function renderPatientDetail(patient) {
 
     // Animate risk bars
     animateRiskBars();
+
+    // Fetch and render sparklines
+    renderVitalsSparklines(patient.patient_id);
+}
+
+async function renderVitalsSparklines(patientId) {
+    const history = await fetchVitalsHistory(patientId);
+
+    if (history && history.heart_rate && history.heart_rate.length > 0) {
+        // Render heart rate sparkline
+        requestAnimationFrame(() => {
+            renderSparkline('sparklineHR', history.heart_rate, '#2563EB', {
+                min: Math.min(...history.heart_rate) - 5,
+                max: Math.max(...history.heart_rate) + 5
+            });
+        });
+    } else {
+        // Generate synthetic data from current vitals for display
+        const detail = patientsDetailCache[patientId];
+        if (detail) {
+            const baseHR = detail.vitals.heart_rate;
+            const syntheticHR = Array.from({ length: 24 }, (_, i) =>
+                baseHR + (Math.sin(i * 0.5) * 8) + (Math.random() * 6 - 3)
+            );
+            requestAnimationFrame(() => {
+                renderSparkline('sparklineHR', syntheticHR, '#2563EB', {
+                    min: Math.min(...syntheticHR) - 5,
+                    max: Math.max(...syntheticHR) + 5
+                });
+            });
+        }
+    }
+
+    if (history && history.sepsis_risk && history.sepsis_risk.length > 0) {
+        // Render sepsis risk sparkline
+        requestAnimationFrame(() => {
+            renderSparkline('sparklineRisk', history.sepsis_risk, '#DC2626', {
+                min: 0,
+                max: 100
+            });
+        });
+    } else {
+        // Generate synthetic risk data
+        const detail = patientsDetailCache[patientId];
+        if (detail) {
+            const baseRisk = detail.risk_prediction.sepsis_risk;
+            const syntheticRisk = Array.from({ length: 24 }, (_, i) =>
+                Math.max(0, Math.min(100, baseRisk + (Math.sin(i * 0.3) * 10) + (Math.random() * 5 - 2.5)))
+            );
+            requestAnimationFrame(() => {
+                renderSparkline('sparklineRisk', syntheticRisk, '#DC2626', {
+                    min: 0,
+                    max: 100
+                });
+            });
+        }
+    }
 }
 
 function animateRiskBars() {
@@ -312,6 +507,20 @@ function stopAutoRefresh() {
 }
 
 // ============================================
+// Window resize handler for sparklines
+// ============================================
+
+let resizeTimeout = null;
+window.addEventListener('resize', () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(() => {
+        if (currentPatient) {
+            renderVitalsSparklines(currentPatient.patient_id);
+        }
+    }, 200);
+});
+
+// ============================================
 // Initialization
 // ============================================
 
@@ -325,6 +534,13 @@ async function initApp() {
 
     // Update risk scores
     await updatePatientRisks();
+
+    // Auto-select the first patient (P001)
+    if (patientsCache.length > 0) {
+        const firstPatientId = patientsCache[0].patient_id;
+        console.log('Auto-selecting first patient:', firstPatientId);
+        await selectPatient(firstPatientId);
+    }
 
     // Update time
     updateCurrentTime();

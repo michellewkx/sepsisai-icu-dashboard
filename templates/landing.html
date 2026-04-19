@@ -1,0 +1,1970 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SepsisAI | AI-Powered Sepsis Early Detection System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* ============================================
+           SepsisAI Landing Page - Production Build
+           ============================================ */
+
+        :root {
+            --font-display: 'Outfit', sans-serif;
+            --font-body: 'IBM Plex Sans', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+
+            --blue-50: #EFF6FF;
+            --blue-100: #DBEAFE;
+            --blue-200: #BFDBFE;
+            --blue-300: #93C5FD;
+            --blue-400: #60A5FA;
+            --blue-500: #3B82F6;
+            --blue-600: #2563EB;
+            --blue-700: #1D4ED8;
+            --blue-900: #1E3A5F;
+
+            --cyan-400: #22D3EE;
+            --cyan-500: #06B6D4;
+            --cyan-600: #0891B2;
+
+            --slate-50: #F8FAFC;
+            --slate-100: #F1F5F9;
+            --slate-200: #E2E8F0;
+            --slate-300: #CBD5E1;
+            --slate-400: #94A3B8;
+            --slate-500: #64748B;
+            --slate-600: #475569;
+            --slate-700: #334155;
+            --slate-800: #1E293B;
+            --slate-900: #0F172A;
+
+            --success: #059669;
+            --warning: #D97706;
+            --danger: #DC2626;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: var(--font-body);
+            color: var(--slate-800);
+            line-height: 1.6;
+            background: #FFFFFF;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        /* ---- Navigation ---- */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 16px 48px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .nav.scrolled {
+            padding: 12px 48px;
+            box-shadow: 0 2px 20px rgba(15, 23, 42, 0.06);
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .nav-logo {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--blue-600), var(--cyan-600));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .nav-title {
+            font-family: var(--font-display);
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--slate-900);
+            letter-spacing: -0.3px;
+        }
+
+        /* Hamburger menu (CSS-only) */
+        .nav-toggle {
+            display: none;
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .nav-toggle-label {
+            display: none;
+            cursor: pointer;
+            width: 44px;
+            height: 44px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            position: relative;
+            z-index: 110;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .hamburger-icon,
+        .hamburger-icon::before,
+        .hamburger-icon::after {
+            display: block;
+            width: 22px;
+            height: 2px;
+            background: var(--slate-700);
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger-icon {
+            position: relative;
+        }
+
+        .hamburger-icon::before,
+        .hamburger-icon::after {
+            content: '';
+            position: absolute;
+            left: 0;
+        }
+
+        .hamburger-icon::before { top: -7px; }
+        .hamburger-icon::after { top: 7px; }
+
+        .nav-toggle:checked ~ .nav-toggle-label .hamburger-icon {
+            background: transparent;
+        }
+
+        .nav-toggle:checked ~ .nav-toggle-label .hamburger-icon::before {
+            top: 0;
+            transform: rotate(45deg);
+        }
+
+        .nav-toggle:checked ~ .nav-toggle-label .hamburger-icon::after {
+            top: 0;
+            transform: rotate(-45deg);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+        }
+
+        .nav-link {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--slate-600);
+            text-decoration: none;
+            transition: color 0.2s;
+            position: relative;
+            padding: 4px 0;
+        }
+
+        .nav-link:hover { color: var(--blue-600); }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--blue-600);
+            transition: width 0.2s;
+        }
+
+        .nav-link:hover::after { width: 100%; }
+
+        .nav-cta {
+            padding: 10px 24px;
+            background: var(--blue-600);
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+            min-height: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-cta:hover {
+            background: var(--blue-700);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(37, 99, 235, 0.35);
+        }
+
+        /* ---- Hero Section ---- */
+        .hero {
+            padding: 160px 48px 100px;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(180deg, var(--blue-50) 0%, #FFFFFF 100%);
+        }
+
+        .hero-bg-pattern {
+            position: absolute;
+            inset: 0;
+            background-image:
+                radial-gradient(circle at 20% 30%, rgba(37, 99, 235, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(8, 145, 178, 0.04) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .hero-grid {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(148, 163, 184, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(148, 163, 184, 0.05) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+        }
+
+        /* Floating particles */
+        .hero-particles {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0;
+            animation: particleFloat linear infinite;
+        }
+
+        .particle:nth-child(1) {
+            width: 8px; height: 8px;
+            background: rgba(37, 99, 235, 0.15);
+            left: 10%; top: 20%;
+            animation-duration: 8s;
+            animation-delay: 0s;
+        }
+        .particle:nth-child(2) {
+            width: 12px; height: 12px;
+            background: rgba(6, 182, 212, 0.12);
+            left: 25%; top: 60%;
+            animation-duration: 10s;
+            animation-delay: 1s;
+        }
+        .particle:nth-child(3) {
+            width: 6px; height: 6px;
+            background: rgba(37, 99, 235, 0.18);
+            left: 50%; top: 30%;
+            animation-duration: 7s;
+            animation-delay: 2s;
+        }
+        .particle:nth-child(4) {
+            width: 10px; height: 10px;
+            background: rgba(6, 182, 212, 0.1);
+            left: 70%; top: 70%;
+            animation-duration: 9s;
+            animation-delay: 0.5s;
+        }
+        .particle:nth-child(5) {
+            width: 7px; height: 7px;
+            background: rgba(37, 99, 235, 0.12);
+            left: 85%; top: 15%;
+            animation-duration: 11s;
+            animation-delay: 3s;
+        }
+        .particle:nth-child(6) {
+            width: 14px; height: 14px;
+            background: rgba(6, 182, 212, 0.08);
+            left: 40%; top: 80%;
+            animation-duration: 12s;
+            animation-delay: 1.5s;
+        }
+        .particle:nth-child(7) {
+            width: 5px; height: 5px;
+            background: rgba(37, 99, 235, 0.2);
+            left: 65%; top: 45%;
+            animation-duration: 8.5s;
+            animation-delay: 4s;
+        }
+        .particle:nth-child(8) {
+            width: 9px; height: 9px;
+            background: rgba(6, 182, 212, 0.14);
+            left: 15%; top: 85%;
+            animation-duration: 10.5s;
+            animation-delay: 2.5s;
+        }
+
+        @keyframes particleFloat {
+            0% {
+                opacity: 0;
+                transform: translateY(0) translateX(0) scale(0.5);
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-120px) translateX(40px) scale(1.2);
+            }
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+        }
+
+        .hero-text { max-width: 560px; }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            background: var(--blue-100);
+            border: 1px solid var(--blue-200);
+            border-radius: 100px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--blue-700);
+            margin-bottom: 24px;
+        }
+
+        .hero-badge-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--blue-600);
+            border-radius: 50%;
+            animation: badgePulse 2s ease-in-out infinite;
+        }
+
+        @keyframes badgePulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .hero h1 {
+            font-family: var(--font-display);
+            font-size: 56px;
+            font-weight: 800;
+            line-height: 1.1;
+            color: var(--slate-900);
+            letter-spacing: -1.5px;
+            margin-bottom: 24px;
+        }
+
+        .hero h1 .highlight {
+            background: linear-gradient(135deg, var(--blue-600), var(--cyan-500));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-desc {
+            font-size: 18px;
+            line-height: 1.7;
+            color: var(--slate-500);
+            margin-bottom: 40px;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 32px;
+            background: var(--blue-600);
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+            box-shadow: 0 4px 16px rgba(37, 99, 235, 0.3);
+            min-height: 48px;
+        }
+
+        .btn-primary:hover {
+            background: var(--blue-700);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(37, 99, 235, 0.35);
+        }
+
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 32px;
+            background: white;
+            color: var(--slate-700);
+            font-size: 16px;
+            font-weight: 600;
+            border: 1px solid var(--slate-200);
+            border-radius: 12px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+            min-height: 48px;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--blue-300);
+            color: var(--blue-600);
+            background: var(--blue-50);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
+        }
+
+        /* Hero Mockup */
+        .hero-visual {
+            position: relative;
+        }
+
+        .hero-mockup {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid var(--slate-200);
+            box-shadow: 0 20px 60px rgba(15, 23, 42, 0.1), 0 4px 16px rgba(15, 23, 42, 0.05);
+            overflow: hidden;
+            transform: perspective(1200px) rotateY(-6deg) rotateX(2deg);
+            transition: transform 0.5s ease;
+            position: relative;
+        }
+
+        .hero-mockup::after {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: 16px;
+            pointer-events: none;
+            background: linear-gradient(
+                110deg,
+                transparent 20%,
+                rgba(37, 99, 235, 0.06) 40%,
+                rgba(6, 182, 212, 0.08) 50%,
+                rgba(37, 99, 235, 0.06) 60%,
+                transparent 80%
+            );
+            background-size: 200% 100%;
+            animation: mockupShimmer 4s ease-in-out infinite;
+        }
+
+        @keyframes mockupShimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .hero-mockup:hover {
+            transform: perspective(1200px) rotateY(-2deg) rotateX(1deg);
+        }
+
+        .mockup-header {
+            padding: 12px 16px;
+            background: var(--slate-50);
+            border-bottom: 1px solid var(--slate-200);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .mockup-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .mockup-dot.red { background: #FCA5A5; }
+        .mockup-dot.yellow { background: #FCD34D; }
+        .mockup-dot.green { background: #6EE7B7; }
+
+        .mockup-body {
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            gap: 16px;
+            min-height: 300px;
+        }
+
+        .mockup-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .mockup-sidebar-item {
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-size: 10px;
+            font-family: var(--font-mono);
+            color: var(--slate-500);
+            background: var(--slate-50);
+            border: 1px solid var(--slate-100);
+        }
+
+        .mockup-sidebar-item.active {
+            background: var(--blue-50);
+            border-color: rgba(37, 99, 235, 0.2);
+            color: var(--blue-600);
+            font-weight: 600;
+        }
+
+        .mockup-main {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .mockup-stat-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .mockup-stat {
+            padding: 12px;
+            background: var(--slate-50);
+            border-radius: 10px;
+            border: 1px solid var(--slate-100);
+        }
+
+        .mockup-stat-label {
+            font-size: 9px;
+            color: var(--slate-400);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .mockup-stat-value {
+            font-family: var(--font-mono);
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .mockup-stat-value.blue { color: var(--blue-600); }
+        .mockup-stat-value.green { color: var(--success); }
+        .mockup-stat-value.amber { color: var(--warning); }
+
+        .mockup-chart {
+            flex: 1;
+            background: var(--slate-50);
+            border-radius: 10px;
+            border: 1px solid var(--slate-100);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            min-height: 120px;
+        }
+
+        .mockup-chart-bars {
+            display: flex;
+            align-items: flex-end;
+            gap: 6px;
+            height: 80px;
+        }
+
+        .mockup-chart-bar {
+            flex: 1;
+            background: linear-gradient(180deg, var(--blue-400), var(--blue-600));
+            border-radius: 4px 4px 0 0;
+            opacity: 0.7;
+            animation: barGrow 1.5s ease-out forwards;
+            transform-origin: bottom;
+        }
+
+        @keyframes barGrow {
+            from { transform: scaleY(0); }
+            to { transform: scaleY(1); }
+        }
+
+        /* Scroll indicator */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            animation: scrollBounce 2s ease-in-out infinite;
+            color: var(--slate-400);
+            text-decoration: none;
+        }
+
+        .scroll-indicator span {
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        @keyframes scrollBounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(8px); }
+        }
+
+        /* ---- Stats Bar ---- */
+        .stats-bar {
+            padding: 48px;
+            background: white;
+            border-top: 1px solid var(--slate-100);
+            border-bottom: 1px solid var(--slate-100);
+        }
+
+        .stats-bar-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 48px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-family: var(--font-display);
+            font-size: 42px;
+            font-weight: 800;
+            color: var(--blue-600);
+            letter-spacing: -1px;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--slate-500);
+            font-weight: 500;
+        }
+
+        /* ---- Features Section ---- */
+        .features {
+            padding: 120px 48px;
+            background: var(--slate-50);
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 640px;
+            margin: 0 auto 72px;
+        }
+
+        .section-overline {
+            display: inline-block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--blue-600);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-family: var(--font-display);
+            font-size: 40px;
+            font-weight: 700;
+            color: var(--slate-900);
+            letter-spacing: -0.8px;
+            margin-bottom: 16px;
+            line-height: 1.2;
+        }
+
+        .section-desc {
+            font-size: 17px;
+            color: var(--slate-500);
+            line-height: 1.7;
+        }
+
+        .features-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .feature-card {
+            padding: 36px;
+            background: white;
+            border: 1px solid var(--slate-200);
+            border-radius: 16px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--blue-600), var(--cyan-500));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        /* Gradient border on hover via ::after */
+        .feature-card::after {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: 16px;
+            padding: 1px;
+            background: linear-gradient(135deg, var(--blue-400), var(--cyan-400), var(--blue-500));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .feature-card:hover {
+            box-shadow: 0 12px 40px rgba(15, 23, 42, 0.08);
+            transform: translateY(-4px);
+        }
+
+        .feature-card:hover::before { opacity: 1; }
+        .feature-card:hover::after { opacity: 1; }
+
+        .feature-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            color: currentColor;
+        }
+
+        .feature-icon.blue { background: var(--blue-100); color: var(--blue-600); }
+        .feature-icon.cyan { background: rgba(8, 145, 178, 0.1); color: var(--cyan-600); }
+        .feature-icon.green { background: rgba(5, 150, 105, 0.1); color: var(--success); }
+        .feature-icon.amber { background: rgba(217, 119, 6, 0.1); color: var(--warning); }
+        .feature-icon.red { background: rgba(220, 38, 38, 0.08); color: var(--danger); }
+        .feature-icon.purple { background: rgba(124, 58, 237, 0.08); color: #7C3AED; }
+
+        .feature-title {
+            font-family: var(--font-display);
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--slate-800);
+            margin-bottom: 10px;
+        }
+
+        .feature-desc {
+            font-size: 15px;
+            color: var(--slate-500);
+            line-height: 1.7;
+        }
+
+        /* ---- How It Works ---- */
+        .how-it-works {
+            padding: 120px 48px;
+            background: white;
+        }
+
+        .steps {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 32px;
+            position: relative;
+        }
+
+        .steps-line {
+            position: absolute;
+            top: 36px;
+            left: 60px;
+            right: 60px;
+            height: 2px;
+            background: var(--slate-200);
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .steps-line-fill {
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, var(--blue-500), var(--cyan-500), var(--blue-500));
+            transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .steps-line-fill.animated {
+            width: 100%;
+        }
+
+        .step {
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-number {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid var(--blue-200);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-display);
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--blue-600);
+            margin: 0 auto 20px;
+            transition: all 0.3s;
+        }
+
+        .step:hover .step-number {
+            background: var(--blue-600);
+            color: white;
+            border-color: var(--blue-600);
+            transform: scale(1.1);
+            box-shadow: 0 8px 24px rgba(37, 99, 235, 0.3);
+        }
+
+        .step-title {
+            font-family: var(--font-display);
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--slate-800);
+            margin-bottom: 8px;
+        }
+
+        .step-desc {
+            font-size: 14px;
+            color: var(--slate-500);
+            line-height: 1.6;
+        }
+
+        /* ---- Tech Section ---- */
+        .tech {
+            padding: 120px 48px;
+            background: var(--slate-900);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tech::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 20% 50%, rgba(37, 99, 235, 0.15), transparent 50%),
+                radial-gradient(circle at 80% 50%, rgba(8, 145, 178, 0.1), transparent 50%);
+            pointer-events: none;
+        }
+
+        /* Grid background pattern */
+        .tech-grid-bg {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+        }
+
+        /* Noise texture overlay */
+        .tech-noise {
+            position: absolute;
+            inset: 0;
+            opacity: 0.03;
+            pointer-events: none;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+            background-size: 256px 256px;
+        }
+
+        .tech .section-header { position: relative; z-index: 1; }
+        .tech .section-overline { color: var(--blue-400); }
+        .tech .section-title { color: white; }
+        .tech .section-desc { color: var(--slate-400); }
+
+        .tech-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .tech-card {
+            padding: 32px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s;
+        }
+
+        .tech-card:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(37, 99, 235, 0.3);
+            transform: translateY(-3px);
+        }
+
+        .tech-card-icon {
+            display: inline-flex;
+            color: var(--blue-400);
+            margin-right: 6px;
+            vertical-align: middle;
+        }
+
+        .tech-card-title {
+            font-family: var(--font-display);
+            font-size: 18px;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tech-card-desc {
+            font-size: 14px;
+            color: var(--slate-400);
+            line-height: 1.7;
+        }
+
+        .tech-tag {
+            display: inline-block;
+            padding: 3px 10px;
+            background: rgba(37, 99, 235, 0.2);
+            border-radius: 6px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--blue-400);
+            margin-top: 12px;
+        }
+
+        /* ---- Partners / Trust Bar ---- */
+        .trust {
+            padding: 80px 48px;
+            background: white;
+            text-align: center;
+        }
+
+        .trust-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--slate-400);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 36px;
+        }
+
+        .trust-logos {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 56px;
+            flex-wrap: wrap;
+        }
+
+        .trust-logo {
+            font-family: var(--font-display);
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--slate-300);
+            transition: color 0.3s;
+            white-space: nowrap;
+        }
+
+        .trust-logo:hover { color: var(--slate-500); }
+
+        /* ---- Impact Section ---- */
+        .impact {
+            padding: 100px 48px;
+            background: linear-gradient(135deg, var(--slate-900) 0%, #111827 100%);
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .impact::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse at 30% 50%, rgba(220, 38, 38, 0.08) 0%, transparent 60%),
+                radial-gradient(ellipse at 70% 50%, rgba(37, 99, 235, 0.08) 0%, transparent 60%);
+            pointer-events: none;
+        }
+
+        .impact-content {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .impact-overline {
+            display: inline-block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--danger);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 32px;
+        }
+
+        .impact-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px;
+            margin-bottom: 32px;
+        }
+
+        .impact-stat {
+            padding: 32px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .impact-stat-number {
+            font-family: var(--font-display);
+            font-size: 48px;
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -1px;
+            margin-bottom: 12px;
+        }
+
+        .impact-stat-number.danger {
+            background: linear-gradient(135deg, #F87171, #DC2626);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .impact-stat-number.blue-grad {
+            background: linear-gradient(135deg, var(--blue-400), var(--cyan-400));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .impact-stat-desc {
+            font-size: 16px;
+            color: var(--slate-400);
+            line-height: 1.6;
+        }
+
+        .impact-citation {
+            font-size: 13px;
+            color: var(--slate-600);
+            font-style: italic;
+            margin-top: 16px;
+        }
+
+        .impact-citation a {
+            color: var(--slate-500);
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+
+        /* ---- CTA Section ---- */
+        .cta {
+            padding: 120px 48px;
+            text-align: center;
+            background: linear-gradient(180deg, var(--blue-50), white);
+            position: relative;
+        }
+
+        .cta-content {
+            max-width: 640px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cta h2 {
+            font-family: var(--font-display);
+            font-size: 44px;
+            font-weight: 800;
+            color: var(--slate-900);
+            letter-spacing: -1px;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .cta p {
+            font-size: 18px;
+            color: var(--slate-500);
+            margin-bottom: 40px;
+            line-height: 1.7;
+        }
+
+        .cta-actions {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+        }
+
+        /* ---- Footer ---- */
+        .footer {
+            padding: 64px 48px 32px;
+            background: var(--slate-900);
+            color: var(--slate-400);
+        }
+
+        .footer-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 48px;
+            padding-bottom: 48px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .footer-brand-desc {
+            font-size: 14px;
+            color: var(--slate-500);
+            line-height: 1.7;
+            margin-top: 12px;
+            max-width: 300px;
+        }
+
+        .footer-col-title {
+            font-family: var(--font-display);
+            font-size: 14px;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 16px;
+        }
+
+        .footer-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .footer-links a {
+            font-size: 14px;
+            color: var(--slate-500);
+            text-decoration: none;
+            transition: color 0.2s;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+        }
+
+        .footer-links a:hover { color: var(--blue-400); }
+
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-top: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-copyright {
+            font-size: 13px;
+            color: var(--slate-600);
+        }
+
+        .footer-sdg {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--slate-500);
+        }
+
+        .sdg-badge {
+            padding: 4px 12px;
+            background: rgba(5, 150, 105, 0.15);
+            border-radius: 6px;
+            font-weight: 600;
+            color: #6EE7B7;
+            font-size: 12px;
+        }
+
+        /* ---- Scroll Animations ---- */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Stagger delays applied via JS, but define base transition here */
+        .animate-on-scroll.delay-1 { transition-delay: 0.1s; }
+        .animate-on-scroll.delay-2 { transition-delay: 0.2s; }
+        .animate-on-scroll.delay-3 { transition-delay: 0.3s; }
+        .animate-on-scroll.delay-4 { transition-delay: 0.4s; }
+        .animate-on-scroll.delay-5 { transition-delay: 0.5s; }
+
+        /* Page transition */
+        body {
+            animation: pageIn 0.6s ease-out;
+        }
+
+        @keyframes pageIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* ---- Responsive: Tablet ---- */
+        @media (max-width: 1024px) {
+            .hero-content { grid-template-columns: 1fr; gap: 48px; }
+            .hero h1 { font-size: 44px; }
+            .hero-text { max-width: 100%; text-align: center; margin: 0 auto; }
+            .hero-actions { justify-content: center; }
+            .hero-visual { display: none; }
+            .features-grid { grid-template-columns: repeat(2, 1fr); }
+            .tech-grid { grid-template-columns: 1fr; }
+            .steps { grid-template-columns: repeat(2, 1fr); }
+            .steps-line { display: none; }
+            .impact-stat-number { font-size: 40px; }
+        }
+
+        /* ---- Responsive: Mobile ---- */
+        @media (max-width: 768px) {
+            .nav { padding: 12px 20px; }
+
+            .nav-toggle-label {
+                display: flex;
+            }
+
+            .nav-links {
+                position: fixed;
+                top: 0;
+                right: 0;
+                width: 280px;
+                height: 100vh;
+                background: white;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                gap: 24px;
+                box-shadow: -8px 0 32px rgba(0, 0, 0, 0.1);
+                transform: translateX(100%);
+                transition: transform 0.3s ease;
+                z-index: 105;
+            }
+
+            .nav-toggle:checked ~ .nav-links {
+                transform: translateX(0);
+            }
+
+            .nav-link {
+                display: block;
+                font-size: 18px;
+                padding: 8px 0;
+            }
+
+            .hero { padding: 120px 20px 80px; }
+            .hero h1 { font-size: 36px; letter-spacing: -1px; }
+            .hero-desc { font-size: 16px; }
+            .hero-actions { flex-direction: column; width: 100%; }
+            .hero-actions .btn-primary,
+            .hero-actions .btn-secondary { width: 100%; justify-content: center; }
+            .scroll-indicator { display: none; }
+
+            .features { padding: 80px 20px; }
+            .features-grid { grid-template-columns: 1fr; }
+            .section-title { font-size: 32px; }
+            .section-desc { font-size: 15px; }
+
+            .stats-bar { padding: 32px 20px; }
+            .stats-bar-inner { grid-template-columns: repeat(2, 1fr); gap: 24px; }
+            .stat-number { font-size: 34px; }
+
+            .how-it-works { padding: 80px 20px; }
+            .steps {
+                grid-template-columns: 1fr;
+                gap: 40px;
+                max-width: 400px;
+                position: relative;
+            }
+            .steps-line {
+                display: block;
+                top: 0;
+                bottom: 0;
+                left: 36px;
+                right: auto;
+                width: 2px;
+                height: 100%;
+            }
+            .steps-line-fill {
+                width: 100%;
+                height: 0;
+                transition: height 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            .steps-line-fill.animated { height: 100%; }
+            .step { text-align: left; display: grid; grid-template-columns: 72px 1fr; gap: 16px; align-items: start; }
+            .step-number { margin: 0; }
+            .step-text { padding-top: 12px; }
+
+            .tech { padding: 80px 20px; }
+            .tech-grid { grid-template-columns: 1fr; }
+
+            .trust { padding: 60px 20px; }
+            .trust-logos { gap: 24px; }
+
+            .impact { padding: 80px 20px; }
+            .impact-stats { grid-template-columns: 1fr; gap: 24px; }
+            .impact-stat-number { font-size: 36px; }
+
+            .cta { padding: 80px 20px; }
+            .cta h2 { font-size: 32px; }
+            .cta-actions { flex-direction: column; align-items: center; }
+            .cta-actions .btn-primary,
+            .cta-actions .btn-secondary { width: 100%; justify-content: center; }
+
+            .footer { padding: 48px 20px 24px; }
+            .footer-grid { grid-template-columns: 1fr; gap: 32px; }
+            .footer-bottom { flex-direction: column; gap: 16px; text-align: center; }
+        }
+
+        /* ---- Responsive: Small Mobile ---- */
+        @media (max-width: 480px) {
+            .hero { padding: 110px 16px 60px; }
+            .hero h1 { font-size: 30px; letter-spacing: -0.8px; }
+            .hero-desc { font-size: 15px; margin-bottom: 28px; }
+            .hero-badge { font-size: 12px; }
+
+            .nav { padding: 10px 16px; }
+
+            .stats-bar { padding: 24px 16px; }
+            .stats-bar-inner { grid-template-columns: 1fr; gap: 20px; }
+            .stat-number { font-size: 30px; }
+            .stat-label { font-size: 13px; }
+
+            .features { padding: 60px 16px; }
+            .feature-card { padding: 24px; }
+            .section-title { font-size: 28px; }
+            .section-header { margin-bottom: 48px; }
+
+            .how-it-works { padding: 60px 16px; }
+            .step-number { width: 56px; height: 56px; font-size: 22px; }
+            .steps-line { left: 28px; }
+
+            .tech { padding: 60px 16px; }
+            .tech-card { padding: 24px; }
+
+            .impact { padding: 60px 16px; }
+            .impact-stat { padding: 24px; }
+            .impact-stat-number { font-size: 30px; }
+            .impact-stat-desc { font-size: 14px; }
+
+            .cta { padding: 60px 16px; }
+            .cta h2 { font-size: 28px; }
+            .cta p { font-size: 15px; }
+
+            .footer { padding: 40px 16px 20px; }
+            .trust { padding: 48px 16px; }
+            .trust-logos { flex-direction: column; gap: 16px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="nav" id="nav">
+        <a href="/" class="nav-brand">
+            <div class="nav-logo">
+                <svg width="22" height="22" viewBox="0 0 28 28" fill="none">
+                    <path d="M14 2L2 8V20L14 26L26 20V8L14 2Z" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                    <path d="M14 10V18" stroke="currentColor" stroke-width="1.5"/>
+                    <path d="M10 14L14 10L18 14" stroke="currentColor" stroke-width="1.5"/>
+                    <circle cx="14" cy="14" r="3" stroke="currentColor" stroke-width="1.5"/>
+                </svg>
+            </div>
+            <span class="nav-title">SepsisAI</span>
+        </a>
+        <input type="checkbox" id="nav-toggle" class="nav-toggle" aria-label="Toggle navigation">
+        <label for="nav-toggle" class="nav-toggle-label" aria-label="Menu">
+            <span class="hamburger-icon"></span>
+        </label>
+        <div class="nav-links">
+            <a href="#features" class="nav-link">Features</a>
+            <a href="#how-it-works" class="nav-link">How It Works</a>
+            <a href="#technology" class="nav-link">Technology</a>
+            <a href="/dashboard" class="nav-cta">Live Dashboard</a>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-bg-pattern"></div>
+        <div class="hero-grid"></div>
+        <div class="hero-particles">
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+        </div>
+        <div class="hero-content">
+            <div class="hero-text">
+                <div class="hero-badge">
+                    <span class="hero-badge-dot"></span>
+                    ITC 2026 Competition Entry
+                </div>
+                <h1>AI-Powered <span class="highlight">Sepsis Detection</span> for Critical Care</h1>
+                <p class="hero-desc">SepsisAI is a multi-stage intelligent framework that enables early detection and proactive management of sepsis in ICU settings, powered by interpretable machine learning and real-time vital sign monitoring.</p>
+                <div class="hero-actions">
+                    <a href="/dashboard" class="btn-primary">
+                        Open Dashboard
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </a>
+                    <a href="#features" class="btn-secondary">
+                        Learn More
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3V13M8 13L4 9M8 13L12 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="hero-mockup">
+                    <div class="mockup-header">
+                        <div class="mockup-dot red"></div>
+                        <div class="mockup-dot yellow"></div>
+                        <div class="mockup-dot green"></div>
+                    </div>
+                    <div class="mockup-body">
+                        <div class="mockup-sidebar">
+                            <div class="mockup-sidebar-item active">P001 M.Chen</div>
+                            <div class="mockup-sidebar-item">P002 S.Mitchell</div>
+                            <div class="mockup-sidebar-item">P003 J.Wilson</div>
+                            <div class="mockup-sidebar-item">P004 E.Rodriguez</div>
+                            <div class="mockup-sidebar-item">P005 D.Thompson</div>
+                        </div>
+                        <div class="mockup-main">
+                            <div class="mockup-stat-row">
+                                <div class="mockup-stat">
+                                    <div class="mockup-stat-label">Sepsis Risk</div>
+                                    <div class="mockup-stat-value blue">32%</div>
+                                </div>
+                                <div class="mockup-stat">
+                                    <div class="mockup-stat-label">Confidence</div>
+                                    <div class="mockup-stat-value green">91%</div>
+                                </div>
+                                <div class="mockup-stat">
+                                    <div class="mockup-stat-label">AKI Risk</div>
+                                    <div class="mockup-stat-value amber">28%</div>
+                                </div>
+                            </div>
+                            <div class="mockup-chart">
+                                <div class="mockup-chart-bars">
+                                    <div class="mockup-chart-bar" style="height: 30%; animation-delay: 0.1s"></div>
+                                    <div class="mockup-chart-bar" style="height: 45%; animation-delay: 0.2s"></div>
+                                    <div class="mockup-chart-bar" style="height: 35%; animation-delay: 0.3s"></div>
+                                    <div class="mockup-chart-bar" style="height: 60%; animation-delay: 0.4s"></div>
+                                    <div class="mockup-chart-bar" style="height: 50%; animation-delay: 0.5s"></div>
+                                    <div class="mockup-chart-bar" style="height: 75%; animation-delay: 0.6s"></div>
+                                    <div class="mockup-chart-bar" style="height: 55%; animation-delay: 0.7s"></div>
+                                    <div class="mockup-chart-bar" style="height: 40%; animation-delay: 0.8s"></div>
+                                    <div class="mockup-chart-bar" style="height: 65%; animation-delay: 0.9s"></div>
+                                    <div class="mockup-chart-bar" style="height: 85%; animation-delay: 1.0s"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <a href="#stats" class="scroll-indicator">
+            <span>Scroll</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 5v14M5 12l7 7 7-7"/>
+            </svg>
+        </a>
+    </section>
+
+    <!-- Stats Bar -->
+    <section class="stats-bar" id="stats">
+        <div class="stats-bar-inner">
+            <div class="stat-item animate-on-scroll">
+                <div class="stat-number" data-target="4" data-prefix=">=" data-suffix="h">&ge;4h</div>
+                <div class="stat-label">Early Warning Window</div>
+            </div>
+            <div class="stat-item animate-on-scroll">
+                <div class="stat-number" data-target="89.3" data-suffix="%" data-decimal="1">89.3%</div>
+                <div class="stat-label">Sepsis Sensitivity</div>
+            </div>
+            <div class="stat-item animate-on-scroll">
+                <div class="stat-number" data-target="18" data-suffix="%">18%</div>
+                <div class="stat-label">Mortality Reduction</div>
+            </div>
+            <div class="stat-item animate-on-scroll">
+                <div class="stat-number">24/7</div>
+                <div class="stat-label">Continuous Monitoring</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section class="features" id="features">
+        <div class="section-header animate-on-scroll">
+            <span class="section-overline">Core Capabilities</span>
+            <h2 class="section-title">Intelligent Sepsis Management from Detection to Treatment</h2>
+            <p class="section-desc">A comprehensive AI-driven framework that supports clinicians at every stage of sepsis care with real-time analytics and actionable insights.</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card animate-on-scroll delay-1">
+                <div class="feature-icon blue">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7z"/>
+                        <path d="M9 21h6"/>
+                        <path d="M9 18h6"/>
+                        <path d="M10 14.5c.3.2.6.3 1 .4V9l-2-1"/>
+                        <path d="M14 14.5c-.3.2-.6.3-1 .4V9l2-1"/>
+                    </svg>
+                </div>
+                <h3 class="feature-title">Early Risk Prediction</h3>
+                <p class="feature-desc">Multi-task learning model trained on MIMIC-IV and eICU datasets predicts sepsis risk at least 4 hours before clinical onset with 89.3% sensitivity.</p>
+            </div>
+            <div class="feature-card animate-on-scroll delay-2">
+                <div class="feature-icon cyan">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2"/>
+                        <path d="M3 9h18"/>
+                        <path d="M9 3v18"/>
+                        <path d="M13 15l2-2 2 2"/>
+                        <path d="M13 12l2 2"/>
+                    </svg>
+                </div>
+                <h3 class="feature-title">Real-Time Vital Monitoring</h3>
+                <p class="feature-desc">Continuous monitoring of 11+ vital parameters including heart rate, blood pressure, lactate levels, and organ function indicators.</p>
+            </div>
+            <div class="feature-card animate-on-scroll delay-3">
+                <div class="feature-icon green">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"/>
+                        <path d="M21 21l-4.35-4.35"/>
+                        <path d="M11 8v6"/>
+                        <path d="M8 11h6"/>
+                    </svg>
+                </div>
+                <h3 class="feature-title">SHAP Explainability</h3>
+                <p class="feature-desc">Transparent AI decisions with SHAP-based factor analysis showing which clinical indicators drive each risk prediction.</p>
+            </div>
+            <div class="feature-card animate-on-scroll delay-4">
+                <div class="feature-icon amber">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                    </svg>
+                </div>
+                <h3 class="feature-title">Multi-Task Risk Assessment</h3>
+                <p class="feature-desc">Simultaneous prediction of sepsis, AKI, ARDS, and mortality risks through shared-representation multi-task learning architecture.</p>
+            </div>
+            <div class="feature-card animate-on-scroll delay-5">
+                <div class="feature-icon red">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                        <path d="M12 2v2"/>
+                    </svg>
+                </div>
+                <h3 class="feature-title">Smart Alert System</h3>
+                <p class="feature-desc">Context-aware clinical alerts with prioritized notifications and evidence-based treatment recommendations for rapid response.</p>
+            </div>
+            <div class="feature-card animate-on-scroll delay-5">
+                <div class="feature-icon purple">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 21h18"/>
+                        <path d="M5 21V7l8-4v18"/>
+                        <path d="M19 21V11l-6-4"/>
+                        <path d="M9 9v.01"/>
+                        <path d="M9 12v.01"/>
+                        <path d="M9 15v.01"/>
+                        <path d="M9 18v.01"/>
+                    </svg>
+                </div>
+                <h3 class="feature-title">HIS Integration Ready</h3>
+                <p class="feature-desc">Designed for seamless integration with existing Hospital Information Systems through standardized HL7 FHIR APIs and flexible deployment options.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="section-header animate-on-scroll">
+            <span class="section-overline">Workflow</span>
+            <h2 class="section-title">How SepsisAI Works</h2>
+            <p class="section-desc">From data ingestion to clinical action, our pipeline processes patient data in real-time to deliver actionable insights.</p>
+        </div>
+        <div class="steps" id="steps-container">
+            <div class="steps-line"><div class="steps-line-fill" id="steps-line-fill"></div></div>
+            <div class="step animate-on-scroll delay-1">
+                <div class="step-number">1</div>
+                <div class="step-text">
+                    <h3 class="step-title">Data Ingestion</h3>
+                    <p class="step-desc">Real-time collection of vital signs, lab results, and clinical notes from EHR systems.</p>
+                </div>
+            </div>
+            <div class="step animate-on-scroll delay-2">
+                <div class="step-number">2</div>
+                <div class="step-text">
+                    <h3 class="step-title">Feature Engineering</h3>
+                    <p class="step-desc">Automated extraction and normalization of 80+ clinical features with temporal patterns.</p>
+                </div>
+            </div>
+            <div class="step animate-on-scroll delay-3">
+                <div class="step-number">3</div>
+                <div class="step-text">
+                    <h3 class="step-title">Risk Prediction</h3>
+                    <p class="step-desc">Multi-task ML model generates sepsis, AKI, ARDS, and mortality risk scores with confidence intervals.</p>
+                </div>
+            </div>
+            <div class="step animate-on-scroll delay-4">
+                <div class="step-number">4</div>
+                <div class="step-text">
+                    <h3 class="step-title">Clinical Action</h3>
+                    <p class="step-desc">AI-powered alerts and personalized treatment recommendations delivered to clinical dashboards.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technology -->
+    <section class="tech" id="technology">
+        <div class="tech-grid-bg"></div>
+        <div class="tech-noise"></div>
+        <div class="section-header animate-on-scroll">
+            <span class="section-overline">Technology Stack</span>
+            <h2 class="section-title">Built with Cutting-Edge AI</h2>
+            <p class="section-desc">Our platform leverages state-of-the-art machine learning architectures trained on the world's largest critical care databases.</p>
+        </div>
+        <div class="tech-grid">
+            <div class="tech-card animate-on-scroll delay-1">
+                <h3 class="tech-card-title">
+                    <span class="tech-card-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2v6"/>
+                            <path d="M12 16v6"/>
+                            <path d="M4.93 4.93l4.24 4.24"/>
+                            <path d="M14.83 14.83l4.24 4.24"/>
+                            <path d="M2 12h6"/>
+                            <path d="M16 12h6"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                    </span>
+                    Multi-Task Learning Architecture
+                </h3>
+                <p class="tech-card-desc">Shared-representation neural network that simultaneously predicts multiple organ dysfunction risks, improving accuracy through cross-task knowledge transfer.</p>
+                <span class="tech-tag">PyTorch + Transformer</span>
+            </div>
+            <div class="tech-card animate-on-scroll delay-2">
+                <h3 class="tech-card-title">
+                    <span class="tech-card-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                        </svg>
+                    </span>
+                    Temporal Pattern Recognition
+                </h3>
+                <p class="tech-card-desc">Advanced time-series analysis capturing temporal deterioration patterns across vital signs, enabling early warning before clinical onset.</p>
+                <span class="tech-tag">LSTM + Attention</span>
+            </div>
+            <div class="tech-card animate-on-scroll delay-3">
+                <h3 class="tech-card-title">
+                    <span class="tech-card-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M6 18L6 6"/>
+                            <path d="M18 6v12"/>
+                            <circle cx="6" cy="6" r="2"/>
+                            <circle cx="18" cy="18" r="2"/>
+                            <path d="M6 12c4 0 6-2 6-6"/>
+                            <path d="M18 12c-4 0-6 2-6 6"/>
+                            <circle cx="12" cy="6" r="1.5"/>
+                            <circle cx="12" cy="18" r="1.5"/>
+                        </svg>
+                    </span>
+                    Clinical Validation
+                </h3>
+                <p class="tech-card-desc">Trained on 260,000+ ICU admissions from MIMIC-IV and eICU databases, with external validation on Tianjin Medical University dataset.</p>
+                <span class="tech-tag">MIMIC-IV + eICU</span>
+            </div>
+            <div class="tech-card animate-on-scroll delay-4">
+                <h3 class="tech-card-title">
+                    <span class="tech-card-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                            <path d="M9 12l2 2 4-4"/>
+                        </svg>
+                    </span>
+                    Explainable AI (XAI)
+                </h3>
+                <p class="tech-card-desc">SHAP-based feature attribution provides clinicians with transparent, interpretable explanations for every risk prediction.</p>
+                <span class="tech-tag">SHAP + LIME</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trust Bar -->
+    <section class="trust">
+        <p class="trust-label">Collaborative Research Partners</p>
+        <div class="trust-logos">
+            <span class="trust-logo">Tsinghua University</span>
+            <span class="trust-logo">Erasmus University Rotterdam</span>
+            <span class="trust-logo">MIMIC-IV</span>
+            <span class="trust-logo">eICU Database</span>
+        </div>
+    </section>
+
+    <!-- Impact Section -->
+    <section class="impact" id="impact">
+        <div class="impact-content animate-on-scroll">
+            <span class="impact-overline">Why Early Detection Matters</span>
+            <div class="impact-stats">
+                <div class="impact-stat animate-on-scroll delay-1">
+                    <div class="impact-stat-number danger">7.6%</div>
+                    <p class="impact-stat-desc">Increase in mortality for every hour of delayed sepsis treatment after onset</p>
+                </div>
+                <div class="impact-stat animate-on-scroll delay-2">
+                    <div class="impact-stat-number blue-grad">48.9M</div>
+                    <p class="impact-stat-desc">People affected by sepsis globally each year, with 11 million deaths annually</p>
+                </div>
+            </div>
+            <p class="impact-citation">Sources: Kumar et al., <em>Critical Care Medicine</em>, 2006; Rudd et al., <em>The Lancet</em>, 2020</p>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta">
+        <div class="cta-content animate-on-scroll">
+            <h2>Ready to See SepsisAI in Action?</h2>
+            <p>Explore our live clinical monitoring dashboard and experience real-time sepsis risk prediction powered by AI.</p>
+            <div class="cta-actions">
+                <a href="/dashboard" class="btn-primary">
+                    Open Live Dashboard
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </a>
+                <a href="#features" class="btn-secondary">View Features</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-grid">
+            <div>
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+                    <div class="nav-logo" style="width: 32px; height: 32px;">
+                        <svg width="18" height="18" viewBox="0 0 28 28" fill="none">
+                            <path d="M14 2L2 8V20L14 26L26 20V8L14 2Z" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                            <circle cx="14" cy="14" r="3" stroke="currentColor" stroke-width="1.5"/>
+                        </svg>
+                    </div>
+                    <span style="font-family: var(--font-display); font-size: 18px; font-weight: 700; color: white;">SepsisAI</span>
+                </div>
+                <p class="footer-brand-desc">AI-driven multi-stage intelligent framework for early sepsis detection and management in ICU settings. Targeting SDG 3: Good Health and Well-being.</p>
+            </div>
+            <div>
+                <h4 class="footer-col-title">Product</h4>
+                <ul class="footer-links">
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#how-it-works">How It Works</a></li>
+                    <li><a href="#technology">Technology</a></li>
+                    <li><a href="/dashboard">Dashboard</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="footer-col-title">Research</h4>
+                <ul class="footer-links">
+                    <li><a href="#">Publications</a></li>
+                    <li><a href="#">Clinical Trials</a></li>
+                    <li><a href="#">Datasets</a></li>
+                    <li><a href="#">Methodology</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="footer-col-title">Team</h4>
+                <ul class="footer-links">
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Tsinghua University</a></li>
+                    <li><a href="#">Erasmus Rotterdam</a></li>
+                    <li><a href="#">ITC 2026</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span class="footer-copyright">&copy; 2026 SepsisAI. ITC International Team Competition.</span>
+            <div class="footer-sdg">
+                <span class="sdg-badge">SDG 3</span>
+                Good Health and Well-being
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ---- Scroll-based nav style ----
+        const nav = document.getElementById('nav');
+        window.addEventListener('scroll', () => {
+            nav.classList.toggle('scrolled', window.scrollY > 20);
+        });
+
+        // ---- Close mobile menu on link click ----
+        document.querySelectorAll('.nav-link, .nav-cta').forEach(link => {
+            link.addEventListener('click', () => {
+                const toggle = document.getElementById('nav-toggle');
+                if (toggle) toggle.checked = false;
+            });
+        });
+
+        // ---- Scroll animations with stagger ----
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+        document.querySelectorAll('.animate-on-scroll').forEach(el => observer.observe(el));
+
+        // ---- Counter animation for stat numbers ----
+        function animateCounter(el) {
+            const target = parseFloat(el.getAttribute('data-target'));
+            if (isNaN(target)) return;
+
+            const prefix = el.getAttribute('data-prefix') || '';
+            const suffix = el.getAttribute('data-suffix') || '';
+            const decimalPlaces = parseInt(el.getAttribute('data-decimal')) || 0;
+            const duration = 1800;
+            const startTime = performance.now();
+
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3);
+                const current = eased * target;
+
+                if (decimalPlaces > 0) {
+                    el.textContent = prefix + current.toFixed(decimalPlaces) + suffix;
+                } else {
+                    el.textContent = prefix + Math.round(current) + suffix;
+                }
+
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                }
+            }
+
+            requestAnimationFrame(update);
+        }
+
+        const counterObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateCounter(entry.target);
+                    counterObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        document.querySelectorAll('.stat-number[data-target]').forEach(el => {
+            counterObserver.observe(el);
+        });
+
+        // ---- Steps connecting line animation ----
+        const stepsLineObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const fill = document.getElementById('steps-line-fill');
+                    if (fill) {
+                        fill.classList.add('animated');
+                    }
+                    stepsLineObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.3 });
+
+        const stepsContainer = document.getElementById('steps-container');
+        if (stepsContainer) {
+            stepsLineObserver.observe(stepsContainer);
+        }
+
+        // ---- Smooth scroll for anchor links ----
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
