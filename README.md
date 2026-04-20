@@ -1,8 +1,10 @@
-# SepsisAI - Clinical Monitoring Dashboard
+# SepsisAI - Clinical Monitoring System
 
-A professional-grade ICU monitoring system for early sepsis detection and management using AI-powered multi-stage prediction framework.
+**Live Demo: [https://sepsisai.vercel.app](https://sepsisai.vercel.app)**
 
-## 🚀 Quick Start
+A professional-grade ICU monitoring system for early sepsis detection and management using AI-powered multi-stage prediction framework. Includes a product landing page and a real-time clinical dashboard.
+
+## Quick Start
 
 ### 1. Install Dependencies
 ```bash
@@ -15,16 +17,18 @@ pip install -r requirements.txt
 python -m app.main
 ```
 
-### 3. Access Dashboard
-Open your browser and navigate to: **http://localhost:8000**
+### 3. Access
+- **Landing Page**: http://localhost:8000
+- **Dashboard**: http://localhost:8000/dashboard
 
-## ✨ Key Features
+## Key Features
 
 ### Clinical Precision Design
-- **Dark theme optimized for ICU environments** with excellent contrast and readability
+- **Light medical-blue theme** optimized for clinical readability
 - **Professional color system** with semantic coding (danger/warning/success)
 - **Typography**: Outfit (display) + IBM Plex Sans (body) + JetBrains Mono (data)
-- **Glassmorphism effects** with subtle gradients and animations
+- **SVG iconography** replacing emojis for professional presentation
+- **Fully responsive** — desktop, tablet, and mobile
 
 ### Three-in-One Framework
 
@@ -38,7 +42,7 @@ Open your browser and navigate to: **http://localhost:8000**
 - Full-chain disease trajectory modeling
 - Complications risk assessment
 - Comprehensive risk profiling
-- Longitudinal patient monitoring
+- Longitudinal patient monitoring with sparkline charts
 
 #### 3. Explainability
 - **SHAP (SHapley Additive exPlanations)** feature importance
@@ -46,39 +50,25 @@ Open your browser and navigate to: **http://localhost:8000**
 - Clinical decision support alerts
 - Actionable recommendations
 
-### Dashboard Features
+### Pages
 
-#### Real-Time Monitoring
+#### Landing Page (`/`)
+- Product overview with animated hero section
+- Impact statistics with counter animations
+- Technology stack and architecture overview
+- How-it-works pipeline visualization
+- Trust indicators and clinical evidence
+
+#### Dashboard (`/dashboard`)
 - **Auto-refresh every 30 seconds**
-- Live patient risk scores
-- Dynamic vitals display
-- Trend analysis
-
-#### Patient Management
-- 5 mock ICU patients with diverse conditions
-- Quick patient overview cards
-- Detailed patient information
-- Diagnosis and comorbidities display
-
-#### Risk Visualization
-- **Circular risk gauge** with color-coded zones
+- 5 mock ICU patients with diverse risk profiles
+- Circular risk gauge with color-coded zones
 - Multi-risk bar charts (AKI, ARDS, Mortality)
-- Confidence interval display
-- Risk trend indicators
+- Vital signs sparkline trend charts (24h history)
+- Critical alerts and clinical recommendations
+- Mobile-responsive with horizontal patient scroll
 
-#### Vital Signs Panel
-- Heart Rate, Blood Pressure, Temperature
-- Respiratory Rate, SpO₂, Lactate
-- Critical value highlighting
-- Unit labels and normal ranges
-
-#### Clinical Alerts & Recommendations
-- Automatic critical alerts (high risk, hypotension, etc.)
-- Context-aware clinical recommendations
-- Sepsis bundle initiation prompts
-- Fluid resuscitation and vasopressor suggestions
-
-## 📊 Mock Patients
+## Mock Patients
 
 | ID | Name | Risk Level | Diagnosis |
 |----|------|------------|-----------|
@@ -88,7 +78,7 @@ Open your browser and navigate to: **http://localhost:8000**
 | P004 | Elena Rodriguez | Medium | Aspiration pneumonia |
 | **P005** | **David Thompson** | **High** | Necrotizing pancreatitis |
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### Backend
 - **FastAPI** - Modern, fast Python web framework
@@ -97,114 +87,34 @@ Open your browser and navigate to: **http://localhost:8000**
 
 ### Frontend
 - **Vanilla JavaScript** - No framework overhead
-- **Custom CSS** - Professional dark theme design
-- **Responsive design** - Works on desktop and tablets
+- **Custom CSS** - Light medical-blue theme with CSS custom properties
+- **Canvas sparklines** - Vitals trend charts without external libraries
+- **Responsive design** - Desktop, tablet, and mobile
 
-### Design System
-- **Fonts**: Outfit + IBM Plex Sans + JetBrains Mono
-- **Colors**: Medical-grade palette with semantic meaning
-- **Animations**: Smooth transitions and micro-interactions
-- **Layout**: Grid-based with flexible components
+### Deployment
+- **Vercel** - Serverless Python (`@vercel/python`)
+- **Domain**: [sepsisai.vercel.app](https://sepsisai.vercel.app)
 
-## 📡 API Endpoints
+## API Endpoints
 
-### Public Endpoints
-- `GET /` - Dashboard HTML interface
-- `GET /api/patients` - List all patients
-- `GET /api/patients/{id}` - Patient detail with risk prediction
-- `GET /api/patients/{id}/vitals/history?hours=24` - Vitals history
-- `GET /api/system/status` - System operational status
+| Method | Path | Description |
+|--------|------|-------------|
+| `GET` | `/` | Landing page |
+| `GET` | `/dashboard` | Clinical dashboard |
+| `GET` | `/api/patients` | List all patients |
+| `GET` | `/api/patients/{id}` | Patient detail with risk prediction |
+| `GET` | `/api/patients/{id}/vitals/history?hours=24` | Vitals history |
+| `GET` | `/api/system/status` | System status |
 
-### Response Format
-
-**Patient Detail Response:**
-```json
-{
-  "patient_id": "P002",
-  "name": "Sarah Mitchell",
-  "age": 67,
-  "gender": "Female",
-  "diagnosis": "Complicated urinary tract infection",
-  "vitals": {
-    "heart_rate": 112.0,
-    "blood_pressure_systolic": 88.0,
-    "lactate": 4.8
-  },
-  "risk_prediction": {
-    "sepsis_risk": 96.0,
-    "aki_risk": 72.5,
-    "ards_risk": 51.2,
-    "mortality_risk": 42.1,
-    "confidence": 86.7
-  },
-  "risk_explanation": {
-    "top_factors": [...],
-    "risk_trend": "rising",
-    "critical_alerts": [...],
-    "recommendations": [...]
-  }
-}
-```
-
-## 🎯 Team Presentation Guide
-
-### Key Talking Points
-
-1. **Problem Statement**
-   - Sepsis causes 11M+ deaths annually
-   - Every hour delay = 8% mortality increase
-   - Current tools lack accuracy and interpretability
-
-2. **Our Solution**
-   - Multi-stage intelligent framework
-   - Three-in-one approach: Accuracy + Systemic + Explainability
-   - Real-time clinical decision support
-
-3. **Technical Innovation**
-   - SHAP-based explainability
-   - Multi-task learning architecture
-   - Informative missingness encoding
-   - Hybrid temporal modeling
-
-4. **Demo Highlights**
-   - Real-time risk monitoring
-   - Transparent AI decisions
-   - Actionable clinical insights
-   - Professional UI/UX design
-
-### Demo Walkthrough
-
-1. **Show patient list** - Mention risk stratification
-2. **Select high-risk patient (P002)** - Demonstrate urgency
-3. **Explain risk gauge** - Visual clarity
-4. **Show SHAP factors** - AI transparency
-5. **Display alerts** - Clinical actionability
-6. **Show recommendations** - Decision support
-
-## 🔮 Future Enhancements
-
-- [ ] Integration with real hospital EHR systems
-- [ ] Multi-modal data (imaging + clinical notes)
-- [ ] Advanced LLM-powered decision agent
-- [ ] Mobile app for bedside monitoring
-- [ ] Multi-center validation studies
-- [ ] Regulatory compliance (FDA/CE)
-
-## 📚 Project Context
+## Project Context
 
 - **Competition**: ITC 2026 (International Team Competition)
 - **Focus**: SDG 3 (Good Health & Well-being)
 - **Team**: Tsinghua University + Erasmus University Rotterdam
 - **Goal**: Transform sepsis from reactive to proactive management
-
-## 🙏 Acknowledgments
-
-- Data sources: MIMIC-IV, eICU, Tianjin Medical University General Hospital
-- Clinical validation: Department of Critical Care Medicine
-- Research collaboration: Cross-institutional team effort
+- **Data sources**: MIMIC-IV, eICU, Tianjin Medical University General Hospital
 
 ---
 
-**Status**: ✅ Production Demo Ready
-**Last Updated**: March 2026
+**Status**: Production Demo Ready
 **Version**: 2.1.0
