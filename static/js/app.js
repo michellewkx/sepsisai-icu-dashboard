@@ -1,5 +1,5 @@
 // ============================================
-// SepsisAI Dashboard - Application Logic
+// Sepsis Navigator Dashboard - Application Logic
 // ============================================
 
 const API_BASE = window.location.origin;
@@ -187,6 +187,20 @@ function renderSparkline(canvasId, data, color, options = {}) {
     ctx.textAlign = 'left';
     ctx.fillText(maxVal.toFixed(0), padding.left + 2, padding.top + 10);
     ctx.fillText(minVal.toFixed(0), padding.left + 2, height - padding.bottom - 2);
+}
+
+async function fetchSystemStatus() {
+    try {
+        const response = await fetch(`${API_BASE}/api/system/status`);
+        if (!response.ok) return;
+        const status = await response.json();
+        const versionEl = document.getElementById('modelVersion');
+        const predEl = document.getElementById('predictionsCount');
+        if (versionEl) versionEl.textContent = status.model_version || 'v2.1.0';
+        if (predEl) predEl.textContent = (status.predictions_last_24h || 0).toLocaleString();
+    } catch (e) {
+        console.error('Error fetching system status:', e);
+    }
 }
 
 // ============================================
@@ -418,12 +432,20 @@ function renderPatientDetail(patient) {
 async function renderVitalsSparklines(patientId) {
     const history = await fetchVitalsHistory(patientId);
 
-    if (history && history.heart_rate && history.heart_rate.length > 0) {
+    // Parse history: API returns {history: [{heart_rate, sepsis_risk, ...}, ...]}
+    let hrData = null;
+    let riskData = null;
+    if (history && history.history && Array.isArray(history.history) && history.history.length > 0) {
+        hrData = history.history.map(d => d.heart_rate);
+        riskData = history.history.map(d => d.sepsis_risk);
+    }
+
+    if (hrData && hrData.length > 0) {
         // Render heart rate sparkline
         requestAnimationFrame(() => {
-            renderSparkline('sparklineHR', history.heart_rate, '#2563EB', {
-                min: Math.min(...history.heart_rate) - 5,
-                max: Math.max(...history.heart_rate) + 5
+            renderSparkline('sparklineHR', hrData, '#2563EB', {
+                min: Math.min(...hrData) - 5,
+                max: Math.max(...hrData) + 5
             });
         });
     } else {
@@ -443,10 +465,10 @@ async function renderVitalsSparklines(patientId) {
         }
     }
 
-    if (history && history.sepsis_risk && history.sepsis_risk.length > 0) {
+    if (riskData && riskData.length > 0) {
         // Render sepsis risk sparkline
         requestAnimationFrame(() => {
-            renderSparkline('sparklineRisk', history.sepsis_risk, '#DC2626', {
+            renderSparkline('sparklineRisk', riskData, '#DC2626', {
                 min: 0,
                 max: 100
             });
@@ -525,12 +547,19 @@ window.addEventListener('resize', () => {
 // ============================================
 
 async function initApp() {
-    console.log('Initializing SepsisAI Dashboard...');
+    console.log('Initializing Sepsis Navigator Dashboard...');
 
     // Load patients
     const patients = await fetchPatients();
     patientsCache = patients;
     renderPatientList(patients);
+
+    // Update patient count
+    const countEl = document.getElementById('patientCountNum');
+    if (countEl) countEl.textContent = patients.length;
+
+    // Fetch system status for header metrics
+    fetchSystemStatus();
 
     // Update risk scores
     await updatePatientRisks();

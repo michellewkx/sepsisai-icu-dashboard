@@ -1,4 +1,4 @@
-"""Sepsis AI Monitoring System - FastAPI Backend"""
+"""Sepsis Navigator - Clinical Intelligence System Backend"""
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -9,15 +9,14 @@ from datetime import datetime, timedelta
 from pathlib import Path
 import random
 
-# Fixed seed for consistent mock data (demonstration stability)
-random.seed(42)
+# No fixed seed — allow slight variation on each refresh for realistic monitoring feel
 
 # Base directory for resolving templates and static files
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 app = FastAPI(
-    title="Sepsis AI Monitoring System",
-    description="Multi-stage intelligent framework for early sepsis detection and management",
+    title="Sepsis Navigator",
+    description="Three-layer Clinical Intelligence System for sepsis management: Perception, Understanding, and Decision",
     version="2.1.0"
 )
 
@@ -320,7 +319,7 @@ MOCK_PATIENTS = {
         "gender": "Male",
         "admission_time": "2026-03-04 22:00",
         "diagnosis": "Necrotizing pancreatitis",
-        "comorbidities": ["Alcoholic Liver Disease", "Chroni Pancreatitis"],
+        "comorbidities": ["Alcoholic Liver Disease", "Chronic Pancreatitis"],
         "current_location": "ICU Bed 2",
         "hours_from_admission": 12
     }

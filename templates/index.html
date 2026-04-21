@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SepsisAI | Clinical Monitoring Dashboard</title>
+    <title>Sepsis Navigator | Clinical Monitoring Dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -33,19 +33,19 @@
                     </svg>
                 </div>
                 <div>
-                    <h1 class="brand-title">SepsisAI</h1>
-                    <p class="brand-subtitle">Early Detection & Management System</p>
+                    <h1 class="brand-title">Sepsis Navigator</h1>
+                    <p class="brand-subtitle">Clinical Intelligence System</p>
                 </div>
             </div>
 
             <div class="header-center">
                 <div class="metric-badge">
                     <span class="metric-label">Model</span>
-                    <span class="metric-value">v2.1.0</span>
+                    <span class="metric-value" id="modelVersion">v2.1.0</span>
                 </div>
                 <div class="metric-badge">
                     <span class="metric-label">Predictions (24h)</span>
-                    <span class="metric-value">1,247</span>
+                    <span class="metric-value" id="predictionsCount">—</span>
                 </div>
             </div>
 
@@ -65,7 +65,7 @@
                 <div class="sidebar-header">
                     <h2 class="sidebar-title">ICU Patients</h2>
                     <div class="patient-count">
-                        <span class="count-number">5</span>
+                        <span class="count-number" id="patientCountNum">—</span>
                         <span class="count-label">patients</span>
                     </div>
                 </div>
