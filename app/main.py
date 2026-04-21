@@ -4,7 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 from datetime import datetime, timedelta
 from pathlib import Path
 import random
@@ -90,12 +90,23 @@ class Patient(BaseModel):
     current_location: str
 
 
+class TimelineEvent(BaseModel):
+    """Clinical timeline event"""
+    time: str
+    event: str
+    type: str  # 'admission', 'warning', 'alert', 'intervention', 'observation'
+    detail: str
+
+
 class PatientDetail(Patient):
     """Patient detail with real-time data"""
     vitals: Vitals
     risk_prediction: RiskPrediction
     risk_explanation: RiskExplanation
     last_update: str
+    timeline_events: List[TimelineEvent] = []
+    ai_clinical_report: str = ""
+    ai_report_confidence: float = 0.0
 
 
 # ============ Mock Data Generators ============
@@ -265,6 +276,173 @@ def generate_shap_explanation(vitals: Vitals, risk: RiskPrediction) -> RiskExpla
     )
 
 
+def generate_timeline_events(patient_id: str, vitals: Vitals, risk: RiskPrediction, patient_data: dict) -> List[TimelineEvent]:
+    """Generate clinical timeline events based on patient risk and vitals"""
+    events = []
+    admission_hour = int(patient_data.get("admission_time", "2026-03-04 08:00").split(" ")[1].split(":")[0])
+
+    # All patients get admission event
+    events.append(TimelineEvent(
+        time=f"{admission_hour:02d}:00",
+        event="ICU Admission",
+        type="admission",
+        detail=f"Admitted from ED — {patient_data.get('diagnosis', 'Unknown')}"
+    ))
+
+    if risk.sepsis_risk >= 60:
+        # High risk patients: full event history
+        events.append(TimelineEvent(
+            time=f"{(admission_hour + 1) % 24:02d}:15",
+            event="Initial Labs Drawn",
+            type="observation",
+            detail="CBC, BMP, lactate, blood cultures, procalcitonin ordered"
+        ))
+        events.append(TimelineEvent(
+            time=f"{(admission_hour + 2) % 24:02d}:30",
+            event="Lactate Elevated",
+            type="warning",
+            detail=f"Lactate {vitals.lactate:.1f} mmol/L — above threshold"
+        ))
+        events.append(TimelineEvent(
+            time=f"{(admission_hour + 3) % 24:02d}:00",
+            event="Tachycardia Noted",
+            type="warning",
+            detail=f"HR {vitals.heart_rate:.0f} bpm sustained > 100"
+        ))
+        events.append(TimelineEvent(
+            time=f"{(admission_hour + 4) % 24:02d}:00",
+            event="AI Alert Triggered",
+            type="alert",
+            detail=f"Sepsis risk exceeded {risk.sepsis_risk:.0f}% — physician notified"
+        ))
+        events.append(TimelineEvent(
+            time=f"{(admission_hour + 4) % 24:02d}:15",
+            event="Blood Cultures Ordered",
+            type="intervention",
+            detail="Two sets obtained per SSC bundle protocol"
+        ))
+        events.append(TimelineEvent(
+            time=f"{(admission_hour + 4) % 24:02d}:45",
+            event="Antibiotics Initiated",
+            type="intervention",
+            detail="Empiric broad-spectrum: Piperacillin/Tazobactam 4.5g IV"
+        ))
+        events.append(TimelineEvent(
+            time=f"{(admission_hour + 5) % 24:02d}:00",
+            event="Fluid Resuscitation",
+            type="intervention",
+            detail="30 mL/kg crystalloid bolus initiated"
+        ))
+    elif risk.sepsis_risk >= 35:
+        # Medium risk
+        events.append(TimelineEvent(
+            time=f"{(admission_hour + 1) % 24:02d}:00",
+            event="Initial Labs Drawn",
+            type="observation",
+            detail="CBC, BMP, lactate, procalcitonin ordered"
+        ))
+        events.append(TimelineEvent(
+            time=f"{(admission_hour + 3) % 24:02d}:00",
+            event="Vital Signs Flagged",
+            type="warning",
+            detail=f"HR {vitals.heart_rate:.0f}, Temp {vitals.temperature:.1f}C — trending abnormal"
+        ))
+        events.append(TimelineEvent(
+            time=f"{(admission_hour + 4) % 24:02d}:00",
+            event="AI Monitoring Active",
+            type="observation",
+            detail=f"Sepsis risk {risk.sepsis_risk:.0f}% — enhanced surveillance mode"
+        ))
+        events.append(TimelineEvent(
+            time=f"{(admission_hour + 5) % 24:02d}:30",
+            event="Repeat Labs Ordered",
+            type="intervention",
+            detail="Repeat lactate and CBC in 4h per monitoring protocol"
+        ))
+    else:
+        # Low risk
+        events.append(TimelineEvent(
+            time=f"{(admission_hour + 2) % 24:02d}:00",
+            event="Initial Assessment Complete",
+            type="observation",
+            detail="Vitals within normal limits, labs unremarkable"
+        ))
+        events.append(TimelineEvent(
+            time=f"{(admission_hour + 6) % 24:02d}:00",
+            event="Routine Monitoring",
+            type="observation",
+            detail=f"Sepsis risk {risk.sepsis_risk:.0f}% — stable, routine monitoring continues"
+        ))
+
+    return events
+
+
+def generate_ai_clinical_report(patient_data: dict, vitals: Vitals, risk: RiskPrediction) -> tuple:
+    """Generate AI clinical narrative report based on patient status. Returns (report_text, confidence)."""
+
+    patient_name = patient_data.get("name", "Patient")
+    diagnosis = patient_data.get("diagnosis", "Unknown")
+    age = patient_data.get("age", 0)
+    comorbidities = patient_data.get("comorbidities", [])
+    comorbidity_str = ", ".join(comorbidities) if comorbidities else "none documented"
+
+    if risk.sepsis_risk >= 70:
+        # High risk — urgent clinical narrative
+        confidence = round(random.uniform(88, 96), 1)
+        report = (
+            f"CRITICAL ASSESSMENT: {age}-year-old patient admitted with {diagnosis.lower()} "
+            f"demonstrating progressive hemodynamic instability consistent with evolving sepsis.\n\n"
+            f"Lactate levels have risen to {vitals.lactate:.1f} mmol/L, consistent with tissue hypoperfusion. "
+            f"MAP has declined to {((vitals.blood_pressure_systolic + 2 * vitals.blood_pressure_diastolic) / 3):.0f} mmHg "
+            f"with concurrent tachycardia (HR {vitals.heart_rate:.0f}). "
+            f"The temporal pattern suggests early septic shock trajectory with an estimated "
+            f"{min(risk.sepsis_risk * 0.85 + random.uniform(-3, 5), 95):.0f}% probability of requiring "
+            f"vasopressor support within 6 hours.\n\n"
+            f"Comorbid conditions ({comorbidity_str}) increase vulnerability to organ dysfunction. "
+            f"Current PaO2/FiO2 ratio of {vitals.pao2_fio2_ratio:.0f} and platelet count {vitals.platelet_count:.0f} K/uL "
+            f"should be monitored for ARDS and DIC progression.\n\n"
+            f"RECOMMEND: Repeat lactate in 30 minutes, assess fluid responsiveness via passive leg raise, "
+            f"evaluate for vasopressor initiation per SSC guidelines. "
+            f"Consider source control imaging if no improvement within 4 hours."
+        )
+    elif risk.sepsis_risk >= 40:
+        # Medium risk — watchful narrative
+        confidence = round(random.uniform(78, 90), 1)
+        report = (
+            f"MODERATE CONCERN: {age}-year-old patient with {diagnosis.lower()} presenting with "
+            f"borderline inflammatory markers requiring close surveillance.\n\n"
+            f"Current vital signs show HR {vitals.heart_rate:.0f} bpm, temperature {vitals.temperature:.1f}C, "
+            f"and lactate {vitals.lactate:.1f} mmol/L. While not yet meeting full SIRS criteria, "
+            f"the trajectory analysis identifies a {risk.sepsis_risk:.0f}% sepsis probability "
+            f"with a {risk.confidence:.0f}% model confidence.\n\n"
+            f"The patient's background of {comorbidity_str} warrants enhanced monitoring. "
+            f"Creatinine at {vitals.creatinine:.2f} mg/dL "
+            f"{'suggests early renal stress' if vitals.creatinine > 1.2 else 'remains within acceptable range'}. "
+            f"SpO2 is {vitals.spo2:.0f}% on current oxygen support.\n\n"
+            f"RECOMMEND: Serial lactate monitoring q4h, reassess hemodynamic status in 2 hours, "
+            f"maintain IV access and ensure blood culture availability if clinical picture deteriorates."
+        )
+    else:
+        # Low risk — reassuring narrative
+        confidence = round(random.uniform(82, 95), 1)
+        report = (
+            f"LOW RISK ASSESSMENT: {age}-year-old patient admitted with {diagnosis.lower()} "
+            f"currently demonstrating hemodynamic stability and low infectious risk profile.\n\n"
+            f"Vital signs are within normal parameters: HR {vitals.heart_rate:.0f} bpm, "
+            f"BP {vitals.blood_pressure_systolic:.0f}/{vitals.blood_pressure_diastolic:.0f} mmHg, "
+            f"temperature {vitals.temperature:.1f}C, respiratory rate {vitals.respiratory_rate:.0f}/min. "
+            f"Lactate level {vitals.lactate:.1f} mmol/L is within normal range. "
+            f"SpO2 {vitals.spo2:.0f}% is satisfactory.\n\n"
+            f"AI multi-layer analysis assigns a {risk.sepsis_risk:.0f}% sepsis probability. "
+            f"No early warning indicators detected across perception, understanding, or decision layers. "
+            f"Background conditions ({comorbidity_str}) are currently well-managed.\n\n"
+            f"RECOMMEND: Continue routine q4h vital sign monitoring. "
+            f"No escalation of care required at this time. Reassess if clinical status changes."
+        )
+
+    return report, confidence
+
+
 # ============ Mock Patient Data ============
 
 MOCK_PATIENTS = {
@@ -365,12 +543,21 @@ async def get_patient_detail(patient_id: str):
     # Generate explanation
     explanation = generate_shap_explanation(vitals, risk)
 
+    # Generate timeline events
+    timeline = generate_timeline_events(patient_id, vitals, risk, patient_data)
+
+    # Generate AI clinical report
+    ai_report, ai_confidence = generate_ai_clinical_report(patient_data, vitals, risk)
+
     return PatientDetail(
         **patient_data,
         vitals=vitals,
         risk_prediction=risk,
         risk_explanation=explanation,
-        last_update=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        last_update=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        timeline_events=timeline,
+        ai_clinical_report=ai_report,
+        ai_report_confidence=ai_confidence
     )
 
 

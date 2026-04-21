@@ -8,6 +8,12 @@ let patientsCache = [];
 let patientsDetailCache = {};
 let autoRefreshInterval = null;
 
+// Global sparkline data storage for tooltip hover
+let sparklineDataStore = {
+    sparklineHR: { data: [], timestamps: [], color: '#2563EB', options: {} },
+    sparklineRisk: { data: [], timestamps: [], color: '#DC2626', options: {} }
+};
+
 // SVG icon for map-pin (used in template literals)
 const SVG_MAP_PIN = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>';
 
@@ -41,6 +47,33 @@ function updateCurrentTime() {
 
 function isMobile() {
     return window.innerWidth <= 768;
+}
+
+// ============================================
+// Dark Mode Toggle
+// ============================================
+
+function initThemeToggle() {
+    const toggle = document.getElementById('themeToggle');
+    if (!toggle) return;
+
+    // Restore saved theme
+    const savedTheme = localStorage.getItem('sepsis-nav-theme');
+    if (savedTheme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+    }
+
+    toggle.addEventListener('click', () => {
+        const current = document.documentElement.getAttribute('data-theme');
+        const next = current === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('sepsis-nav-theme', next);
+
+        // Re-render sparklines since canvas colors may need updating
+        if (currentPatient) {
+            setTimeout(() => renderVitalsSparklines(currentPatient.patient_id), 100);
+        }
+    });
 }
 
 // ============================================
@@ -187,6 +220,103 @@ function renderSparkline(canvasId, data, color, options = {}) {
     ctx.textAlign = 'left';
     ctx.fillText(maxVal.toFixed(0), padding.left + 2, padding.top + 10);
     ctx.fillText(minVal.toFixed(0), padding.left + 2, height - padding.bottom - 2);
+
+    // Store computed points for tooltip hover
+    if (sparklineDataStore[canvasId]) {
+        sparklineDataStore[canvasId].points = points;
+        sparklineDataStore[canvasId].padding = padding;
+        sparklineDataStore[canvasId].chartWidth = chartWidth;
+        sparklineDataStore[canvasId].chartHeight = chartHeight;
+        sparklineDataStore[canvasId].width = width;
+        sparklineDataStore[canvasId].height = height;
+        sparklineDataStore[canvasId].minVal = minVal;
+        sparklineDataStore[canvasId].maxVal = maxVal;
+    }
+}
+
+// ============================================
+// Sparkline Tooltip Hover Handler
+// ============================================
+
+function initSparklineTooltips() {
+    ['sparklineHR', 'sparklineRisk'].forEach(canvasId => {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return;
+
+        const tooltipId = canvasId === 'sparklineHR' ? 'tooltipHR' : 'tooltipRisk';
+        const tooltip = document.getElementById(tooltipId);
+        if (!tooltip) return;
+
+        canvas.addEventListener('mousemove', (e) => {
+            const store = sparklineDataStore[canvasId];
+            if (!store || !store.data || store.data.length === 0 || !store.points) return;
+
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+
+            // Find nearest point
+            let nearestIdx = 0;
+            let nearestDist = Infinity;
+            store.points.forEach((p, i) => {
+                const dist = Math.abs(p.x - mouseX);
+                if (dist < nearestDist) {
+                    nearestDist = dist;
+                    nearestIdx = i;
+                }
+            });
+
+            const value = store.data[nearestIdx];
+            const timestamp = store.timestamps[nearestIdx] || `${nearestIdx}h ago`;
+            const point = store.points[nearestIdx];
+
+            // Update tooltip content
+            tooltip.querySelector('.tooltip-time').textContent = timestamp;
+            const unit = canvasId === 'sparklineHR' ? ' bpm' : '%';
+            tooltip.querySelector('.tooltip-value').textContent = (typeof value === 'number' ? value.toFixed(1) : value) + unit;
+
+            // Position tooltip
+            tooltip.style.display = 'block';
+            tooltip.style.left = point.x + 'px';
+            tooltip.style.top = (point.y - 4) + 'px';
+
+            // Redraw sparkline with crosshair
+            renderSparkline(canvasId, store.data, store.color, store.options);
+
+            // Draw crosshair
+            const ctx = canvas.getContext('2d');
+            const dpr = window.devicePixelRatio || 1;
+            ctx.save();
+            ctx.scale(dpr, dpr);
+            ctx.strokeStyle = 'rgba(148, 163, 184, 0.4)';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([4, 3]);
+            ctx.beginPath();
+            ctx.moveTo(point.x, store.padding.top);
+            ctx.lineTo(point.x, store.height - store.padding.bottom);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Draw hover dot
+            ctx.beginPath();
+            ctx.arc(point.x, point.y, 5, 0, Math.PI * 2);
+            ctx.fillStyle = store.color;
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(point.x, point.y, 2.5, 0, Math.PI * 2);
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fill();
+            ctx.restore();
+        });
+
+        canvas.addEventListener('mouseout', () => {
+            tooltip.style.display = 'none';
+            // Redraw without crosshair
+            const store = sparklineDataStore[canvasId];
+            if (store && store.data && store.data.length > 0) {
+                renderSparkline(canvasId, store.data, store.color, store.options);
+            }
+        });
+    });
 }
 
 async function fetchSystemStatus() {
@@ -370,6 +500,25 @@ function renderPatientDetail(patient) {
     clone.querySelector('.lactate-value').textContent = vitals.lactate.toFixed(2);
     clone.querySelector('.vitals-time').textContent = formatTime(patient.last_update);
 
+    // Timeline events
+    const timelineTrack = clone.querySelector('.timeline-track');
+    if (patient.timeline_events && patient.timeline_events.length > 0) {
+        patient.timeline_events.forEach(event => {
+            const eventEl = document.createElement('div');
+            eventEl.className = `timeline-event type-${event.type}`;
+            eventEl.innerHTML = `
+                <div class="timeline-event-header">
+                    <span class="timeline-event-name">${event.event}</span>
+                    <span class="timeline-event-time">${event.time}</span>
+                </div>
+                <div class="timeline-event-detail">${event.detail}</div>
+            `;
+            timelineTrack.appendChild(eventEl);
+        });
+    } else {
+        timelineTrack.innerHTML = '<div class="timeline-event type-observation"><div class="timeline-event-header"><span class="timeline-event-name">No events recorded</span></div></div>';
+    }
+
     // Risk explanation
     const explanation = patient.risk_explanation;
     const trendBadge = clone.querySelector('.risk-trend');
@@ -418,6 +567,20 @@ function renderPatientDetail(patient) {
         recommendationsList.innerHTML = '<div class="recommendation-item">Continue monitoring</div>';
     }
 
+    // AI Clinical Intelligence Report
+    const aiReportContent = clone.querySelector('.ai-report-content');
+    const aiConfidenceValue = clone.querySelector('.ai-confidence-value');
+    if (patient.ai_clinical_report) {
+        aiReportContent.textContent = patient.ai_clinical_report;
+    } else {
+        aiReportContent.textContent = 'AI clinical report is being generated...';
+    }
+    if (patient.ai_report_confidence) {
+        aiConfidenceValue.textContent = `${patient.ai_report_confidence.toFixed(1)}%`;
+    } else {
+        aiConfidenceValue.textContent = '--';
+    }
+
     // Render
     panel.innerHTML = '';
     panel.appendChild(clone);
@@ -432,21 +595,30 @@ function renderPatientDetail(patient) {
 async function renderVitalsSparklines(patientId) {
     const history = await fetchVitalsHistory(patientId);
 
-    // Parse history: API returns {history: [{heart_rate, sepsis_risk, ...}, ...]}
+    // Parse history: API returns {history: [{heart_rate, sepsis_risk, timestamp, ...}, ...]}
     let hrData = null;
     let riskData = null;
+    let timestamps = null;
     if (history && history.history && Array.isArray(history.history) && history.history.length > 0) {
         hrData = history.history.map(d => d.heart_rate);
         riskData = history.history.map(d => d.sepsis_risk);
+        timestamps = history.history.map(d => d.timestamp || '');
     }
 
     if (hrData && hrData.length > 0) {
-        // Render heart rate sparkline
+        const hrOptions = {
+            min: Math.min(...hrData) - 5,
+            max: Math.max(...hrData) + 5
+        };
+        // Store data globally for tooltip hover
+        sparklineDataStore.sparklineHR = {
+            data: hrData,
+            timestamps: timestamps || [],
+            color: '#2563EB',
+            options: hrOptions
+        };
         requestAnimationFrame(() => {
-            renderSparkline('sparklineHR', hrData, '#2563EB', {
-                min: Math.min(...hrData) - 5,
-                max: Math.max(...hrData) + 5
-            });
+            renderSparkline('sparklineHR', hrData, '#2563EB', hrOptions);
         });
     } else {
         // Generate synthetic data from current vitals for display
@@ -456,22 +628,33 @@ async function renderVitalsSparklines(patientId) {
             const syntheticHR = Array.from({ length: 24 }, (_, i) =>
                 baseHR + (Math.sin(i * 0.5) * 8) + (Math.random() * 6 - 3)
             );
+            const syntheticTimestamps = Array.from({ length: 24 }, (_, i) => `${24 - i}h ago`);
+            const hrOptions = {
+                min: Math.min(...syntheticHR) - 5,
+                max: Math.max(...syntheticHR) + 5
+            };
+            sparklineDataStore.sparklineHR = {
+                data: syntheticHR,
+                timestamps: syntheticTimestamps,
+                color: '#2563EB',
+                options: hrOptions
+            };
             requestAnimationFrame(() => {
-                renderSparkline('sparklineHR', syntheticHR, '#2563EB', {
-                    min: Math.min(...syntheticHR) - 5,
-                    max: Math.max(...syntheticHR) + 5
-                });
+                renderSparkline('sparklineHR', syntheticHR, '#2563EB', hrOptions);
             });
         }
     }
 
     if (riskData && riskData.length > 0) {
-        // Render sepsis risk sparkline
+        const riskOptions = { min: 0, max: 100 };
+        sparklineDataStore.sparklineRisk = {
+            data: riskData,
+            timestamps: timestamps || [],
+            color: '#DC2626',
+            options: riskOptions
+        };
         requestAnimationFrame(() => {
-            renderSparkline('sparklineRisk', riskData, '#DC2626', {
-                min: 0,
-                max: 100
-            });
+            renderSparkline('sparklineRisk', riskData, '#DC2626', riskOptions);
         });
     } else {
         // Generate synthetic risk data
@@ -481,14 +664,22 @@ async function renderVitalsSparklines(patientId) {
             const syntheticRisk = Array.from({ length: 24 }, (_, i) =>
                 Math.max(0, Math.min(100, baseRisk + (Math.sin(i * 0.3) * 10) + (Math.random() * 5 - 2.5)))
             );
+            const syntheticTimestamps = Array.from({ length: 24 }, (_, i) => `${24 - i}h ago`);
+            const riskOptions = { min: 0, max: 100 };
+            sparklineDataStore.sparklineRisk = {
+                data: syntheticRisk,
+                timestamps: syntheticTimestamps,
+                color: '#DC2626',
+                options: riskOptions
+            };
             requestAnimationFrame(() => {
-                renderSparkline('sparklineRisk', syntheticRisk, '#DC2626', {
-                    min: 0,
-                    max: 100
-                });
+                renderSparkline('sparklineRisk', syntheticRisk, '#DC2626', riskOptions);
             });
         }
     }
+
+    // Initialize tooltip handlers after sparklines are rendered
+    setTimeout(() => initSparklineTooltips(), 200);
 }
 
 function animateRiskBars() {
@@ -548,6 +739,9 @@ window.addEventListener('resize', () => {
 
 async function initApp() {
     console.log('Initializing Sepsis Navigator Dashboard...');
+
+    // Initialize dark mode toggle
+    initThemeToggle();
 
     // Load patients
     const patients = await fetchPatients();

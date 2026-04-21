@@ -1,5 +1,5 @@
 /* ============================================
-   SepsisAI Dashboard - Light Theme
+   Sepsis Navigator Dashboard - Light Theme
    Clean Medical Blue Design
    Full Mobile Responsive
    ============================================ */
@@ -612,7 +612,9 @@ body {
 .vitals-card,
 .explanation-card,
 .clinical-card,
-.vitals-sparkline-card {
+.vitals-sparkline-card,
+.timeline-card,
+.ai-report-card {
     background: var(--bg-elevated);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-lg);
@@ -627,7 +629,9 @@ body {
 .vitals-card:hover,
 .explanation-card:hover,
 .clinical-card:hover,
-.vitals-sparkline-card:hover {
+.vitals-sparkline-card:hover,
+.timeline-card:hover,
+.ai-report-card:hover {
     box-shadow: var(--shadow-md);
 }
 
@@ -1074,11 +1078,9 @@ body {
 }
 
 .sparkline-chart-wrapper canvas {
+    /* Styling moved to .sparkline-canvas-container canvas for tooltip support */
     width: 100%;
     height: 100px;
-    background: var(--bg-primary);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-sm);
 }
 
 /* ============================================
@@ -1266,6 +1268,494 @@ body {
 }
 
 /* ============================================
+   Theme Toggle Button
+   ============================================ */
+.theme-toggle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid var(--border-subtle);
+    background: var(--bg-primary);
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition-fast);
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.theme-toggle:hover {
+    border-color: rgba(37, 99, 235, 0.3);
+    color: var(--accent-primary);
+    background: var(--accent-primary-dim);
+    box-shadow: var(--shadow-sm);
+    transform: rotate(15deg);
+}
+
+.theme-toggle .icon-sun,
+.theme-toggle .icon-moon {
+    transition: all var(--transition-normal);
+    position: absolute;
+}
+
+/* Light mode: show moon, hide sun */
+.theme-toggle .icon-sun {
+    opacity: 0;
+    transform: scale(0.5) rotate(-90deg);
+}
+
+.theme-toggle .icon-moon {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+}
+
+/* Dark mode: show sun, hide moon */
+[data-theme="dark"] .theme-toggle .icon-sun {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+}
+
+[data-theme="dark"] .theme-toggle .icon-moon {
+    opacity: 0;
+    transform: scale(0.5) rotate(90deg);
+}
+
+/* ============================================
+   Clinical Timeline Card
+   ============================================ */
+.timeline-card {
+    position: relative;
+}
+
+.timeline-header {
+    margin-bottom: var(--space-lg);
+}
+
+.timeline-header h3 {
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.timeline-header h3 svg {
+    color: var(--accent-primary);
+}
+
+.timeline-track {
+    position: relative;
+    padding-left: 28px;
+}
+
+.timeline-track::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 4px;
+    bottom: 4px;
+    width: 2px;
+    background: linear-gradient(180deg,
+        var(--accent-primary) 0%,
+        var(--accent-cyan) 50%,
+        var(--border-subtle) 100%
+    );
+    border-radius: 1px;
+}
+
+.timeline-event {
+    position: relative;
+    margin-bottom: var(--space-md);
+    padding: var(--space-md);
+    background: var(--bg-primary);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    opacity: 0;
+    animation: timelineSlideIn 0.4s ease-out forwards;
+    transition: all var(--transition-fast);
+}
+
+.timeline-event:hover {
+    border-color: rgba(37, 99, 235, 0.2);
+    box-shadow: var(--shadow-sm);
+    transform: translateX(4px);
+}
+
+@keyframes timelineSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.timeline-event:nth-child(1) { animation-delay: 0.1s; }
+.timeline-event:nth-child(2) { animation-delay: 0.18s; }
+.timeline-event:nth-child(3) { animation-delay: 0.26s; }
+.timeline-event:nth-child(4) { animation-delay: 0.34s; }
+.timeline-event:nth-child(5) { animation-delay: 0.42s; }
+.timeline-event:nth-child(6) { animation-delay: 0.50s; }
+.timeline-event:nth-child(7) { animation-delay: 0.58s; }
+.timeline-event:nth-child(8) { animation-delay: 0.66s; }
+
+.timeline-event::before {
+    content: '';
+    position: absolute;
+    left: -24px;
+    top: 16px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid;
+    background: var(--bg-elevated);
+    z-index: 1;
+}
+
+.timeline-event.type-admission::before {
+    border-color: var(--accent-primary);
+    background: var(--accent-primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.timeline-event.type-observation::before {
+    border-color: var(--accent-cyan);
+    background: var(--bg-elevated);
+}
+
+.timeline-event.type-warning::before {
+    border-color: var(--warning);
+    background: var(--warning);
+    box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15);
+}
+
+.timeline-event.type-alert::before {
+    border-color: var(--danger);
+    background: var(--danger);
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+}
+
+.timeline-event.type-intervention::before {
+    border-color: var(--success);
+    background: var(--success);
+    box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15);
+}
+
+.timeline-event-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-xs);
+}
+
+.timeline-event-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.timeline-event-time {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-tertiary);
+    padding: 2px 8px;
+    background: var(--bg-tertiary);
+    border-radius: 4px;
+}
+
+.timeline-event-detail {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.timeline-event.type-admission {
+    border-left: 3px solid var(--accent-primary);
+}
+
+.timeline-event.type-warning {
+    border-left: 3px solid var(--warning);
+    background: var(--warning-dim);
+}
+
+.timeline-event.type-alert {
+    border-left: 3px solid var(--danger);
+    background: var(--danger-dim);
+}
+
+.timeline-event.type-intervention {
+    border-left: 3px solid var(--success);
+    background: var(--success-dim);
+}
+
+.timeline-event.type-observation {
+    border-left: 3px solid var(--accent-cyan);
+}
+
+/* ============================================
+   Sparkline Tooltip
+   ============================================ */
+.sparkline-canvas-container {
+    position: relative;
+}
+
+.sparkline-canvas-container canvas {
+    width: 100%;
+    height: 100px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    cursor: crosshair;
+}
+
+.sparkline-tooltip {
+    position: absolute;
+    pointer-events: none;
+    z-index: 100;
+    padding: 6px 10px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-medium);
+    border-radius: 6px;
+    box-shadow: var(--shadow-md);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    white-space: nowrap;
+    transform: translateX(-50%) translateY(-100%);
+    margin-top: -8px;
+}
+
+.sparkline-tooltip .tooltip-time {
+    display: block;
+    color: var(--text-tertiary);
+    font-size: 10px;
+    margin-bottom: 2px;
+}
+
+.sparkline-tooltip .tooltip-value {
+    display: block;
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 13px;
+}
+
+/* ============================================
+   AI Clinical Intelligence Report Card
+   ============================================ */
+.ai-report-card {
+    position: relative;
+    background: var(--bg-elevated);
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+
+.ai-report-card::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: calc(var(--radius-lg) + 2px);
+    background: linear-gradient(135deg, #2563EB, #06B6D4, #2563EB);
+    background-size: 200% 200%;
+    animation: gradientShift 4s ease-in-out infinite;
+    z-index: -1;
+}
+
+@keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+.ai-report-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-lg);
+    padding-bottom: var(--space-md);
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.ai-report-title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.ai-report-title svg {
+    color: var(--accent-primary);
+}
+
+.ai-report-title h3 {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-cyan));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.ai-report-badge {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: 5px 14px;
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(6, 182, 212, 0.08));
+    border: 1px solid rgba(37, 99, 235, 0.15);
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--accent-primary);
+    letter-spacing: 0.3px;
+}
+
+.ai-badge-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent-primary);
+    animation: aiPulse 2s ease-in-out infinite;
+    box-shadow: 0 0 6px rgba(37, 99, 235, 0.4);
+}
+
+@keyframes aiPulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+        box-shadow: 0 0 6px rgba(37, 99, 235, 0.4);
+    }
+    50% {
+        opacity: 0.6;
+        transform: scale(1.3);
+        box-shadow: 0 0 12px rgba(37, 99, 235, 0.6);
+    }
+}
+
+.ai-report-content {
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.85;
+    color: var(--text-secondary);
+    white-space: pre-line;
+    padding: var(--space-lg);
+    background: var(--bg-primary);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-lg);
+    position: relative;
+}
+
+.ai-report-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, var(--accent-primary), var(--accent-cyan));
+    border-radius: 4px 0 0 4px;
+}
+
+.ai-report-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: var(--space-md);
+    border-top: 1px solid var(--border-subtle);
+}
+
+.ai-report-model {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    font-style: italic;
+}
+
+.ai-report-confidence {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.ai-confidence-value {
+    font-weight: 700;
+    color: var(--accent-primary);
+}
+
+/* ============================================
+   Dark Mode Theme Variables
+   ============================================ */
+[data-theme="dark"] {
+    --bg-primary: #0F172A;
+    --bg-secondary: #1E293B;
+    --bg-tertiary: #334155;
+    --bg-elevated: #1E293B;
+    --text-primary: #F1F5F9;
+    --text-secondary: #94A3B8;
+    --text-tertiary: #64748B;
+    --border-subtle: rgba(148, 163, 184, 0.1);
+    --border-medium: rgba(148, 163, 184, 0.2);
+    --glass-bg: rgba(15, 23, 42, 0.85);
+    --glass-border: rgba(148, 163, 184, 0.08);
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.4);
+    --shadow-blue: 0 4px 16px rgba(37, 99, 235, 0.15);
+    --accent-primary-dim: rgba(37, 99, 235, 0.12);
+    --accent-primary-light: rgba(37, 99, 235, 0.15);
+    --accent-cyan-dim: rgba(8, 145, 178, 0.12);
+    --accent-blue-dim: rgba(59, 130, 246, 0.12);
+    --danger-dim: rgba(220, 38, 38, 0.12);
+    --warning-dim: rgba(217, 119, 6, 0.12);
+    --success-dim: rgba(5, 150, 105, 0.12);
+}
+
+[data-theme="dark"] .bg-gradient {
+    background:
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(37, 99, 235, 0.1), transparent),
+        radial-gradient(ellipse 60% 40% at 100% 100%, rgba(8, 145, 178, 0.06), transparent);
+}
+
+[data-theme="dark"] .bg-grid {
+    background-image:
+        linear-gradient(rgba(148, 163, 184, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(148, 163, 184, 0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+}
+
+[data-theme="dark"] .primary-risk-card {
+    background: linear-gradient(135deg, #1E293B, #1a2540);
+}
+
+[data-theme="dark"] .brand-title {
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .patient-card.active {
+    background: rgba(37, 99, 235, 0.12);
+}
+
+/* Smooth transition for theme change */
+html {
+    transition: background-color 0.3s ease;
+}
+
+html[data-theme="dark"] body,
+html[data-theme="dark"] .header,
+html[data-theme="dark"] .sidebar,
+html[data-theme="dark"] .main-panel {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* ============================================
    Responsive - Tablet (max-width: 1400px)
    ============================================ */
 @media (max-width: 1400px) {
@@ -1292,6 +1782,12 @@ body {
 
     .sparkline-container {
         grid-template-columns: 1fr;
+    }
+
+    .ai-report-footer {
+        flex-direction: column;
+        gap: var(--space-sm);
+        align-items: flex-start;
     }
 }
 
@@ -1467,7 +1963,8 @@ body {
         grid-template-columns: 1fr;
     }
 
-    .sparkline-chart-wrapper canvas {
+    .sparkline-chart-wrapper canvas,
+    .sparkline-canvas-container canvas {
         height: 80px;
     }
 
@@ -1479,6 +1976,37 @@ body {
 
     .factor-impact {
         display: none;
+    }
+
+    /* Timeline responsive */
+    .timeline-event-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-xs);
+    }
+
+    /* AI Report responsive */
+    .ai-report-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-sm);
+    }
+
+    .ai-report-footer {
+        flex-direction: column;
+        gap: var(--space-sm);
+        align-items: flex-start;
+    }
+
+    .ai-report-content {
+        padding: var(--space-md);
+        font-size: 13px;
+    }
+
+    /* Theme toggle */
+    .theme-toggle {
+        width: 34px;
+        height: 34px;
     }
 }
 
@@ -1555,7 +2083,9 @@ body {
     .vitals-card,
     .explanation-card,
     .clinical-card,
-    .vitals-sparkline-card {
+    .vitals-sparkline-card,
+    .timeline-card,
+    .ai-report-card {
         padding: var(--space-md);
         margin-bottom: var(--space-md);
     }
@@ -1570,7 +2100,8 @@ body {
     }
 
     /* Sparkline canvas shorter */
-    .sparkline-chart-wrapper canvas {
+    .sparkline-chart-wrapper canvas,
+    .sparkline-canvas-container canvas {
         height: 70px;
     }
 
