@@ -274,13 +274,24 @@
             <!-- Patient Event Timeline (5) -->
             <div class="timeline-card anim-card" style="--card-index: 5;">
                 <div class="timeline-header">
-                    <h3>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <polyline points="12 6 12 12 16 14"></polyline>
-                        </svg>
-                        Clinical Timeline
-                    </h3>
+                    <div class="timeline-title-group">
+                        <div class="timeline-icon-wrap">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3>Clinical Timeline</h3>
+                            <span class="timeline-subtitle">Real-time event stream</span>
+                        </div>
+                    </div>
+                    <div class="timeline-legend">
+                        <span class="tl-legend-item tl-leg-admission"><span class="tl-leg-dot"></span>Admission</span>
+                        <span class="tl-legend-item tl-leg-warning"><span class="tl-leg-dot"></span>Warning</span>
+                        <span class="tl-legend-item tl-leg-alert"><span class="tl-leg-dot"></span>Alert</span>
+                        <span class="tl-legend-item tl-leg-intervention"><span class="tl-leg-dot"></span>Intervention</span>
+                    </div>
                 </div>
                 <div class="timeline-track"></div>
             </div>
@@ -471,21 +482,46 @@
             <div class="ai-report-card anim-card" style="--card-index: 10;">
                 <div class="ai-report-header">
                     <div class="ai-report-title">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M12 2a4 4 0 0 1 4 4v1a2 2 0 0 1 2 2v1a2 2 0 0 0 2 2 2 2 0 0 1 0 4 2 2 0 0 0-2 2v1a2 2 0 0 1-2 2v1a4 4 0 0 1-8 0v-1a2 2 0 0 1-2-2v-1a2 2 0 0 0-2-2 2 2 0 0 1 0-4 2 2 0 0 0 2-2V9a2 2 0 0 1 2-2V6a4 4 0 0 1 4-4z"/>
-                            <circle cx="12" cy="12" r="2"/>
-                        </svg>
-                        <h3>AI Clinical Intelligence Report</h3>
+                        <div class="ai-icon-wrap">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 2a4 4 0 0 1 4 4v1a2 2 0 0 1 2 2v1a2 2 0 0 0 2 2 2 2 0 0 1 0 4 2 2 0 0 0-2 2v1a2 2 0 0 1-2 2v1a4 4 0 0 1-8 0v-1a2 2 0 0 1-2-2v-1a2 2 0 0 0-2-2 2 2 0 0 1 0-4 2 2 0 0 0 2-2V9a2 2 0 0 1 2-2V6a4 4 0 0 1 4-4z"/>
+                                <circle cx="12" cy="12" r="2"/>
+                            </svg>
+                            <div class="ai-icon-pulse"></div>
+                        </div>
+                        <div>
+                            <h3>AI Clinical Intelligence</h3>
+                            <span class="ai-report-subtitle">LLM-Assisted Diagnostic Analysis</span>
+                        </div>
                     </div>
-                    <div class="ai-report-badge">
-                        <span class="ai-badge-dot"></span>
-                        LLM-Assisted
+                    <div class="ai-confidence-gauge">
+                        <svg class="confidence-ring" viewBox="0 0 80 80" width="72" height="72">
+                            <circle class="confidence-ring-bg" cx="40" cy="40" r="30" fill="none" stroke-width="5"/>
+                            <circle class="confidence-ring-fill" cx="40" cy="40" r="30" fill="none" stroke-width="5"
+                                stroke-dasharray="188.5" stroke-dashoffset="188.5"
+                                stroke-linecap="round" transform="rotate(-90 40 40)"/>
+                        </svg>
+                        <div class="confidence-ring-center">
+                            <span class="ai-confidence-value">--</span>
+                            <span class="confidence-ring-label">conf.</span>
+                        </div>
                     </div>
                 </div>
-                <div class="ai-report-content"></div>
+                <div class="ai-report-body">
+                    <div class="ai-report-content"></div>
+                </div>
                 <div class="ai-report-footer">
-                    <span class="ai-report-model">Powered by Medical LLM (LoRA fine-tuned)</span>
-                    <span class="ai-report-confidence">Decision Confidence: <span class="ai-confidence-value"></span></span>
+                    <div class="ai-report-meta">
+                        <span class="ai-badge-dot"></span>
+                        <span class="ai-report-model">Medical LLM &middot; LoRA fine-tuned</span>
+                    </div>
+                    <div class="ai-report-status">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                        Analysis Complete
+                    </div>
                 </div>
             </div>
         </div>

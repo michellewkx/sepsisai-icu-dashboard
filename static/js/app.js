@@ -503,10 +503,19 @@ function renderPatientDetail(patient) {
     // Timeline events
     const timelineTrack = clone.querySelector('.timeline-track');
     if (patient.timeline_events && patient.timeline_events.length > 0) {
+        const typeIcons = {
+            admission: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>',
+            warning: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+            alert: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+            intervention: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+            observation: '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>'
+        };
         patient.timeline_events.forEach(event => {
             const eventEl = document.createElement('div');
             eventEl.className = `timeline-event type-${event.type}`;
+            const icon = typeIcons[event.type] || typeIcons.observation;
             eventEl.innerHTML = `
+                <div class="timeline-node">${icon}</div>
                 <div class="timeline-event-header">
                     <span class="timeline-event-name">${event.event}</span>
                     <span class="timeline-event-time">${event.time}</span>
@@ -516,7 +525,7 @@ function renderPatientDetail(patient) {
             timelineTrack.appendChild(eventEl);
         });
     } else {
-        timelineTrack.innerHTML = '<div class="timeline-event type-observation"><div class="timeline-event-header"><span class="timeline-event-name">No events recorded</span></div></div>';
+        timelineTrack.innerHTML = '<div class="timeline-event type-observation"><div class="timeline-node"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="timeline-event-header"><span class="timeline-event-name">No events recorded</span></div></div>';
     }
 
     // Risk explanation
@@ -570,13 +579,27 @@ function renderPatientDetail(patient) {
     // AI Clinical Intelligence Report
     const aiReportContent = clone.querySelector('.ai-report-content');
     const aiConfidenceValue = clone.querySelector('.ai-confidence-value');
+    const confidenceRingFill = clone.querySelector('.confidence-ring-fill');
     if (patient.ai_clinical_report) {
         aiReportContent.textContent = patient.ai_clinical_report;
     } else {
         aiReportContent.textContent = 'AI clinical report is being generated...';
     }
     if (patient.ai_report_confidence) {
-        aiConfidenceValue.textContent = `${patient.ai_report_confidence.toFixed(1)}%`;
+        aiConfidenceValue.textContent = `${patient.ai_report_confidence.toFixed(0)}%`;
+        // Animate the SVG ring gauge
+        const circumference = 2 * Math.PI * 30; // r=30 in the SVG
+        const offset = circumference - (patient.ai_report_confidence / 100) * circumference;
+        if (confidenceRingFill) {
+            confidenceRingFill.style.strokeDasharray = circumference;
+            confidenceRingFill.style.strokeDashoffset = circumference; // start empty
+            // Animate after DOM insertion
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    confidenceRingFill.style.strokeDashoffset = offset;
+                });
+            });
+        }
     } else {
         aiConfidenceValue.textContent = '--';
     }
